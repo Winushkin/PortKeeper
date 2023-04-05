@@ -1,0 +1,888 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Inter;
+}
+
+
+/* * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    outline: 1px solid orange;
+} */
+
+
+header {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    /* padding: 30px 0; */
+    align-items: center;
+    background-color: #3D2E65;
+    height: 12vh;
+}
+
+
+.link-a {
+    font-variant: small-caps;
+}
+.link-a:hover {
+    text-decoration: underline;
+    color: #ffffff68;
+}
+
+
+.main-page {
+    height: 88vh;
+    width: 100%;
+    background-color: #201E3A;
+    background-image: url(../img/papers.png);
+    background-position: left, right;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+
+.tittle {
+    font-family: Inter, sans-serif;
+    color: #FFFFFF;
+    font-size: 48px;
+    padding-top: 150px;
+    /* width: 701px; */
+    text-align: center;
+    position: relative;
+}
+
+
+.tittle::before {
+    content: "";
+    position: absolute;
+    width: 186px;
+    height: 149px;
+    left: 740px;
+    top: 240px;
+    background-image: url("../img/lines.png");
+    transform: rotate(178deg);
+}
+
+
+.tittle::after {
+    content: "";
+    position: absolute;
+    width: 186px;
+    height: 149px;
+    left: 250px;
+    top: 70px;
+    /* display: inline-block; */
+    background-image: url("../img/lines.png");
+    transform: rotate(-2deg);
+}
+
+
+.main-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+
+.button {
+    width: 225px;
+    color: white;
+    padding: 12px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    cursor: pointer;
+    margin-top: 111px;
+    transition: all ease 0.3s;
+}
+
+
+.button-pink {
+    background-color: #E3A8A8;
+    box-shadow: 0px 0px 1px #855858;
+    color: white;
+}
+
+
+.button-pink:hover {
+    box-shadow: 12px 12px 1px #855858;
+}
+
+
+.button-yellow {
+    background-color: #E2E3A8;
+    box-shadow: 0px 0px 1px #848558;
+    color: black;
+    margin-left: 40px;
+}
+
+
+.button-yellow:hover {
+    box-shadow: 12px 12px 1px #848558;
+}
+
+
+
+
+
+
+
+
+
+
+
+.auth-page {
+    height: 88vh;
+    width: 100%;
+    background-color: #201E3A;
+    padding-top: 80px;
+
+}
+
+
+.inf-page {
+    width: 100%;
+    background-color: #201E3A;
+    padding-top: 80px;
+    padding-bottom: 20px;
+}
+
+
+.add-portfolio-page {
+    width: 100%;
+    background-color: #201E3A;
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+
+form {
+    /* margin-left: 450px; */
+    margin: 0 auto;
+    max-width: 650px;
+    /* margin-top: 100px; */
+    box-shadow: 20px 20px 0px #443C5B;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    padding: 25px;
+}
+
+
+.tittle-auth {
+    font-family: Inter, sans-serif;
+    color: #724848;
+    font-size: 40px;
+    position: relative;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+/* profile page */
+
+
+.profile-page {
+    min-height: 88vh;
+    width: 100%;
+    background-color: #201E3A;
+    padding-top: 80px;
+}
+
+
+.links {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+
+a {
+    /* margin-top: 25px; */
+    text-decoration: none;
+    color: white;
+    font-family: Inter;
+    font-size: 24px;
+}
+
+
+.login, .password, .about, .label {
+    width: 100%;
+}
+
+
+.button-3 {
+    width: 400px;
+    height: 91px;
+    background-color: #A15656;
+    /* border: none; */
+    color: white;
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 40px;
+    margin: 4px 2px;
+    cursor: pointer;
+    margin-top: 40px;
+    margin-left: 100px;
+    transition: all ease 0.3s;
+}
+
+
+
+
+.txt-bt-3 {
+    font-size: 30px;
+}
+
+
+input {
+    width: 100%;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 3px solid #8558587a;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+}
+
+
+input[type=text]:focus {
+    border: 3px solid #855858;
+}
+
+
+input[type=password]:focus {
+    border: 3px solid #855858;
+}
+
+
+input::placeholder {
+    color: #72484878;
+}
+
+
+.login {
+    margin-top: 20px;
+}
+
+
+.password {
+    margin-top: 40px;
+}
+
+
+.button-3:hover {
+    background-color: #FFFFFF;
+    border: 3px solid #A15656;
+    color: #201E3A;
+    box-shadow: 0 12px 16px 0 rgba(241, 39, 53, 0.19), 0 12px 30px 0 rgba(116, 39, 241, 0.19);
+    border-style: dashed;
+}
+
+.st-table {
+    text-align: center;
+}
+
+
+.tittle-kl {
+    /* box-shadow: 12px 12px 1px #855858; */
+    text-align: center;
+    width: 312px;
+    padding: 12px 32px;
+    color: #FFFFFF;
+    font-size: 48px;
+    background-color: #E3A8A8;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+
+.tittls-1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+
+.students {
+    background-color: #FFFFFF;
+    width: 530px;
+}
+thead {
+    display: flex;
+}
+.students-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-y: scroll;
+    height: 300px;
+    justify-content: stretch;
+}
+
+tr {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+}
+
+
+th:first-child, td:first-child {
+    width: 80%;
+}
+th:last-child, td:last-child {
+    width: 20%;
+}
+
+
+
+
+.teacher-profile {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+
+.button-plus {
+    width: 300px;
+    background-color: #D58787;
+    border: 3px solid #D58787;
+    color: white;
+    padding: 12px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 40px;
+    /* margin: 4px 2px; */
+    cursor: pointer;
+    /* margin-top: 30px; */
+    /* margin-left: 1080px; */
+    transition: all ease 0.3s;
+}
+
+.button-add{
+    width: 300px;
+    height: 75px;
+    padding: 20px 0 20px 7px;
+    margin: 100px 0px 100px 0px;
+    background-color: #D58787;
+    border: 3px solid #D58787;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    transition: all ease 0.3s;
+    cursor: pointer;
+
+
+
+}
+
+
+
+.button-plus:hover {
+    background-color: #ffffff;
+    color: #855858;
+    border: 3px solid #855858;
+}
+
+
+
+
+.avatar-1 {
+    padding: 20px;
+}
+
+
+
+
+/* .container-teacher-profile {
+    text-align: center;
+} */
+
+
+
+
+.profile {
+    text-align: center;
+    float: left;
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    justify-content: flex-start;
+}
+
+
+
+
+.abt {
+    width: 100%;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 3px solid #8558587a;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+    margin-top: 20px;
+}
+
+
+
+
+textarea[type=text]:focus {
+    border: 3px solid #855858;
+}
+
+
+textarea::placeholder {
+    color: #72484878;
+}
+
+
+
+
+table {
+    border-collapse: collapse;
+}
+
+
+
+
+th, td {
+    border: 2px solid #8558587a;
+    padding: 20px 20px;
+    text-align: left;
+    color: #855858;
+    /* width: 200px; */
+}
+
+.student-link{
+    color: #855858;
+}
+
+
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+
+
+
+th {
+    background-color: #A15656;
+    color: #FFFFFF;
+    border: none;
+    text-align: center;
+}
+
+
+/*
+.students {
+    margin-left: 920px;
+} */
+
+
+.port-text {
+    color: #FFFFFF;
+    font-family: Inter;
+    font-size: 24px;
+    margin-top: 15px;
+}
+
+
+.port-start {
+    display: flex;
+}
+
+
+
+
+/* .st-inf {
+    margin-top: 90px;
+    margin-left: 30px;
+} */
+
+
+
+
+/* .avatar-2 {
+    margin-top: 50px;
+    margin-left: 80px;
+} */
+
+
+.header-page {
+    color: #FFFFFF;
+    font-size: 34px;
+    text-align: center;
+    padding: 50px 0;
+    /* margin-left: 91px;
+    margin-top: 30px; */
+}
+
+
+.marks {
+    /* margin-left: 91px;
+    margin-top: 30px; */
+    background-color: #FFFFFF;
+    width: 100%;
+}
+
+
+.marks-tb {
+    max-width: 100%;
+}
+
+
+.marks-2 {
+    background-color: #FFFFFF;
+    width: 100%;
+}
+.nonono{
+    color: #FFFFFF;
+    font-size: 34px;
+    text-align: center;
+}
+
+/* .diplom {
+    margin-top: 30px;
+    margin-left: 91px;
+} */
+
+
+.idk {
+    display: flex;
+    align-items: center;
+}
+
+
+.dip-text {
+    color: #FFFFFF;
+    font-size: 36px;
+    font-family: Inter;
+    /* margin-top: 50px;
+    margin-left: 60px; */
+}
+
+
+.dip-text-2 {
+    color: #FFFFFF;
+    font-size: 36px;
+    font-family: Inter;
+    /* margin-top: 5px;
+    margin-left: 60px; */
+}
+
+
+.button-6 {
+    width: 150px;
+    background-color: #D58787;
+    border: 3px solid #D58787;
+    color: white;
+    padding: 12px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 50px;
+    cursor: pointer;
+    transition: all ease 0.3s;
+    /* margin-top: 70px;
+    margin-left: 180px; */
+}
+
+
+.button-6:hover {
+    background-color: #ffffff;
+    color: #855858;
+    border: 3px solid #855858;
+}
+
+
+.button-7 {
+    align-items: center;
+    width: 150px;
+    background-color: #E2E3A8;
+    border: 3px solid #E2E3A8;
+    color: white;
+    padding: 12px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 50px;
+    cursor: pointer;
+    transition: all ease 0.3s;
+    margin-top: 50px;
+    display: inline-block;
+}
+
+
+.button-7:hover {
+    background-color: #ffffff;
+    color: #848558;
+    border: 3px solid #848558;
+}
+
+
+.txt-add {
+    color: #FFFFFF;
+    font-size: 30px;
+    text-align: center;
+    /* margin-top: 10px;
+    margin-left: 183px; */
+}
+
+
+.txt-add-2 {
+    color: #FFFFFF;
+    font-size: 30px;
+    text-align: center;
+    /* margin-top: 10px;
+    margin-left: 305px; */
+}
+
+
+
+
+.profile-page-st {
+    min-height: 88vh;
+    width: 100%;
+    background-color: #201E3A;
+}
+
+
+
+
+.th-2:first-child, .td-2:first-child, .th-2:nth-child(2), .td-2:nth-child(2), .th-2:nth-child(3), .td-2:nth-child(3), .th-2:nth-child(4), .td-2:nth-child(4), .th-2:nth-child(5), .td-2:nth-child(5){
+    width: 20%;
+}
+
+
+
+
+.header-txt {
+    color: #FFFFFF;
+    font-size: 48px;
+    text-align: center;
+    background-color: #E3A8A8;
+    width: 40%;
+    margin: 0 auto;
+}
+
+
+
+
+
+
+
+
+.student-card {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+
+
+
+.student-info {
+    width: 40%;
+    text-align: center;
+}
+
+
+
+
+.student-table {
+    width: 60%;
+    border: none;
+    box-shadow: none;
+    background-color: #201E3A;
+    text-align: center;
+}
+
+
+.student-table td {
+    padding: 0;
+}
+
+.student-table select{
+    outline: none;
+    border: none;
+}
+
+.student-table p{
+    padding: 20px 0px 20px 40px;
+}
+
+.portfolio-files {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+
+
+
+.portfolio-item {
+    width: 25%;
+    padding: 35px;
+    border: 1px solid #8558587a;
+    text-align: center;
+}
+
+
+
+
+.portfolio-image{
+    width: 100%;
+}
+
+
+.portfolio-title {
+    color: #FFFFFF;
+    padding: 5px 0 5px 0;
+}
+
+
+.abt-sait {
+    margin-top: 50px;
+    background-color: #FFFFFF;
+}
+
+
+select {
+    width: 100%;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 3px solid #8558587a;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+}
+
+
+/*file*/
+.upload-file__input {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+    overflow: hidden;
+    width: 0.4px;
+    height: 0.4px;
+}
+
+
+.upload-file__label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto 0px auto;
+    max-width: 100%;
+    border: 2px dashed #8558587a;
+    padding: 9px 49px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+.upload-file__icon {
+    width: 30px;
+    height: auto;
+    margin-right: 11px;
+    fill: #8558587a;
+}
+
+
+.upload-file__label .upload-file__text,
+.upload-file__label .upload-file__icon path {
+    transition: .25s ease;
+}
+
+
+.upload-file__label:hover .upload-file__text {
+    color: #855858;
+}
+
+
+.upload-file__label:hover .upload-file__icon path {
+    fill: #855858;
+}
+
+
+.upload-file__label:hover {
+    border: 2px dashed #855858;
+}
+
+
+.txt-inf {
+    margin: 0 auto;
+    text-align: center;
+    font-size: 24px;
+}
+
+
+.txt-abt {
+    font-size: 24px;
+    display: flex;
+    margin-left: 50px;
+}
+
+
+.auther-photo {
+    width: 300px;
+}
+
+
+.abt-auther {
+    font-family: Inter;
+    display: flex;
+    align-items: center;
+    line-height: 40px;
+}
+
+.button-center {
+    margin-left: 450px;
+}
+
+.button-c {
+    display: inline-block;
+
+    margin: 0 auto;
+    margin-top: 20px;
+    /* margin-left: 800px;  */
+}
+
+.dost-button{
+    width: auto;
+    background-color: #ffffff;
+    color: #848558;
+    border: 3px solid #848558;
+}
+
+.btn-save {
+    width: auto;
+    font-size: 25px;
+}
+
+.login-p {
+    background-color: #fff;
+    margin: 8px;
+    padding: 15px 15px;
+    border: 3px solid #8558587a;
+    color: #724848;
+}

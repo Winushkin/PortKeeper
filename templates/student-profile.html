@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block content %}
+  <section class="profile-page-st">
+    <div class="container">
+      <h2 class="header-page">Результаты промежуточной аттестации</h2>
+      <div class="student-card">
+        <div class="student-info">
+          <img src={{url_for('static', filename='img/avatar 1.png')}}  alt="avatar-1" class="avatar-2">
+          <p class="port-text">{{ student[1] }}</p>
+          <p class="port-text">Класс: {{ student[6] }}</p>
+        </div>
+
+        <form class="student-table" method="post">
+          <table class="marks">
+            <thead>
+              <tr>
+                <th>Предмет</th>
+                <th>Отметка/балл</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% if "teacher_id" in session %}
+                    {% for i in range(1, 5) %}
+                      <tr>
+                        <td>
+                          <select name="exam{{i}}">
+                            {% if exams %}
+                              {% for subject in range(19) %}
+                                  {% if subjects[subject] == exams[i-1][1] %}
+                                    <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
+                                  {% else %}
+                                    <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
+                                  {% endif %}
+                              {% endfor %}
+                            {% else %}
+                              {% for subject in range(19) %}
+                                {% if subjects[subject] == i %}
+                                  <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
+                                {% else %}
+                                  <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                          </select>
+                        </td>
+                        <td>
+                          <select name="mark{{i}}">
+                            {% for mark in range(1, 6) %}
+                                {% if mark == exams[i-1][2] %}
+                                  <option value={{mark}} selected>{{mark}}</option>
+                                {% else %}
+                                  <option value={{mark}}>{{mark}}</option>
+                                {% endif %}
+                            {% endfor %}
+                          </select>
+                        </td>
+                      </tr>
+                    {% endfor %}
+
+                  {% elif "student_id" in session %}
+
+
+                    {% for exam in exams %}
+                      <tr>
+                        <td>
+                          <p>{{exam[1]}}</p>
+                        </td>
+                        <td>
+                          <p>{{exam[2]}}</p>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  {% endif %}
+            </tbody>
+          </table>
+          {% if "teacher_id" in session %}
+            <button class="button-c button-plus btn-save"><strong>Сохранить</strong></button>
+          {% endif %}
+        </form>
+      </div>
+
+<!--     выше идеальный код ------------------------- -->
+
+      {% if port %}
+      <p class="header-page"><strong>Сводная ведомость достижений учащегося (Олимпиады)</strong></p>
+      <div class="marks-tb">
+        <table class="marks-2">
+
+          <thead>
+            <tr>
+              <th class="th-2">Уровень</th>
+              <th class="th-2">Предмет</th>
+              <th class="th-2">Название</th>
+              <th class="th-2">Дата</th>
+              <th class="th-2">Результаты</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for item in port %}
+            <tr>
+              <td class="td-2">{{item[6]}}</td>
+              <td class="td-2">{{item[2]}}</td>
+              <td class="td-2">{{item[1]}}</td>
+              <td class="td-2">{{item[-1]}}</td>
+              <td class="td-2">{{item[-2]}}</td>
+            </tr>
+          {% endfor %}
+
+          </tbody>
+        </table>
+      </div>
+        {% if "student_id" in session %}
+        <a href="/add-portfolio" type="submit" class="button-center button-add"><strong>Добавить достижение</strong></a>
+        {% endif %}
+      <p class="header-page"><strong>Достижения:</strong></p>
+      <div class="portfolio-files">
+
+        {% for item in port %}
+        <div class="portfolio-item">
+          <img src={{url_for('static', filename='files/' + item[5])}} alt="" class="portfolio-image">
+          <p class="portfolio-title">{{item[1]}}</p>
+          <a href='/download/{{ item[5] }}' class="portfolio-link">скачать</a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        {% if "student_id" in session %}
+        <a href="/add-portfolio" type="submit" class="button-center button-add"><strong>Добавить достижение</strong></a>
+        {% endif %}
+      {% endif %}
+
+    </div>
+
+  </section>
+{% endblock %}

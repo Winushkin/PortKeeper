@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+    <section class="auth-page">
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+             <p class="tittle-2"><strong>Войти как учитель</strong></p>
+
+            {{form.username(class='login', placeholder='Введите логин')}}
+            {% for error in form.username.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+
+            {{form.password(class='password', placeholder='Введите пароль')}}
+            {% for error in form.password.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+
+            {{form.submit(class='button-3')}}
+        </form>
+    </section>
+{% endblock %}

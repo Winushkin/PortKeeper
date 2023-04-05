@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href={{url_for('static', filename='css/normalize.css')}}>
+    <link rel="stylesheet" href={{url_for('static', filename='css/styles.css')}}>
+</head>
+<body>
+<header>
+    <a href={{url_for('index')}} class="link-a">Главная</a>
+    <a href={{url_for('info')}} class="link-a">Информация</a>
+    <a href="https://thl-syktyvkar.gosuslugi.ru/" class="link-a" target="_blank">Сайт школы</a>
+    {% if "teacher_id" in session %}
+        <a href={{url_for("logout")}} class="link-a">{{(session["login"])[ :session["login"].rfind(" ")]}}<br>(Выйти)</a>
+    {% elif "student_id" in session %}
+        <a href={{url_for("logout")}} class="link-a">{{(session["login"])[ :session["login"].rfind(" ")]}}<br>(Выйти)</a>
+    {% else %}
+        <a class="link-a">Вход не выполнен</a>
+    {% endif %}
+</header>
+{% block content %}
+
+{% endblock %}
+</body>
+</html>

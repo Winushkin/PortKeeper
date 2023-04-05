@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+    <section class="inf-page">
+        <div class="container">
+            <p class="header-txt"><strong>Информация о сайте</strong></p>
+            <div class="abt-sait">
+                <p class="txt-inf">Сайт сделан в 2023 году<br> Над данным проектом работали:</p>
+            </div>
+            <div class="abt-sait abt-auther">
+                <img src="img/marina-photo.jpeg" alt="Marina" class="auther-photo">
+                <p class="txt-abt">Бордюг Марина, <br>ученица Технологического лицея, <br> ответственная за frountend</p>
+            </div>
+            <div class="abt-sait abt-auther">
+                <img src="img/marina-photo.jpeg" alt="Marina" class="auther-photo">
+                <p class="txt-abt">Бордюг Марина, <br>ученица Технологического лицея, <br> ответственная за frountend</p>
+            </div>
+        </div>
+    </section>
+
+    <script src={{url_for("static", filename="scripts/script.js")}}></script>
+{% endblock %}
