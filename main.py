@@ -4,11 +4,11 @@ from flask import Flask, render_template, redirect, session, request, send_from_
 from forms.login_form import LoginForm
 from database import DataBase
 from forms.StudentAdd_form import AddStudents
-from login_generator import generate_login
+from added_files.login_generator import generate_login
 
 
 UPLOAD_FOLDER = './static/files'
-ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg'])
+ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg']
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "q1w2e3r4t5y"
@@ -43,7 +43,7 @@ def teacher_login():
         return redirect("classes")
     form = LoginForm()
     if form.validate_on_submit():
-        name = form.username.data
+        name = form.login.data
         password = form.password.data
         teacher = db.get_teacher(name, password)
         if teacher:
@@ -63,9 +63,9 @@ def student_login():
     if "student_id" in session:
         return redirect("profile")
     if form.validate_on_submit():
-        name = form.username.data
+        login = form.login.data
         password = form.password.data
-        student = db.get_student(name, password)
+        student = db.get_student(login, password)
         if student:
             session["student_id"] = student[0]
             session["login"] = student[1]
@@ -99,6 +99,7 @@ def profile_by_id(student_id):
             mark = request.form.get("mark" + str(i))
             db.insert_exams(subject, mark, student_id)
         exams = db.get_exams_by_student_id(student_id)
+    print(exams)
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
                            exams=exams, subjects=exams_subjects)
 

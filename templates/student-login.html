@@ -5,8 +5,8 @@
             {{ form.hidden_tag() }}
              <p class="tittle-2"><strong>Войти как ученик</strong></p>
 
-            {{form.username(class='login', placeholder='Введите логин')}}
-            {% for error in form.username.errors %}
+            {{form.login(class='login', placeholder='Введите логин')}}
+            {% for error in form.login.errors %}
                 <div class="error">{{ error }}</div>
             {% endfor %}
 

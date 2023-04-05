@@ -7,7 +7,7 @@
         <div class="student-info">
           <img src={{url_for('static', filename='img/avatar 1.png')}}  alt="avatar-1" class="avatar-2">
           <p class="port-text">{{ student[1] }}</p>
-          <p class="port-text">Класс: {{ student[6] }}</p>
+          <p class="port-text">Класс: {{ student[7] }}</p>
         </div>
 
         <form class="student-table" method="post">
@@ -23,16 +23,19 @@
                     {% for i in range(1, 5) %}
                       <tr>
                         <td>
-                          <select name="exam{{i}}">
+
                             {% if exams %}
-                              {% for subject in range(19) %}
-                                  {% if subjects[subject] == exams[i-1][1] %}
-                                    <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
-                                  {% else %}
-                                    <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
-                                  {% endif %}
-                              {% endfor %}
+                              <select name="exam{{i}}">
+                                {% for subject in range(19) %}
+                                    {% if subjects[subject] == exams[i-1][1] %}
+                                      <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
+                                    {% else %}
+                                      <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                              </select>
                             {% else %}
+                          <select name="exam{{i}}">
                               {% for subject in range(19) %}
                                 {% if subjects[subject] == i %}
                                   <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>

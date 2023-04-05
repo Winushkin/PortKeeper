@@ -16,7 +16,7 @@ class DataBase:
         CREATE TABLE IF NOT EXISTS students ( 
             student_id           INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT ,
             name                 TEXT NOT NULL                                ,
-            login                TEXT NOT NUll                                ,
+            login                TEXT NOT NULL                                ,
             password             TEXT NOT NULL                                ,
             avatar               BLOB                                         ,
             birth_date           DATE                                         ,
@@ -88,9 +88,9 @@ class DataBase:
             return None
         return result
 
-    def get_student(self, name, password):
-        sql = """SELECT * FROM students WHERE password = ? AND name = ?"""
-        self.cursor.execute(sql, (password, name))
+    def get_student(self, login, password):
+        sql = """SELECT * FROM students WHERE password = ? AND login = ?"""
+        self.cursor.execute(sql, (password, login))
         result = self.cursor.fetchone()
         if not result:
             return None
@@ -107,9 +107,9 @@ class DataBase:
 
 
 
-    def insert_student(self, name, login, password, teacher_id, learn_class):
+    def insert_student(self, name, login, password, teacher_id, class_num):
         sql = f"""INSERT INTO students (name, login, password, teacher_id, class) VALUES (?, ?, ? ,?, ?)"""
-        self.cursor.execute(sql, (name, login, password, teacher_id, learn_class))
+        self.cursor.execute(sql, (name, login, password, teacher_id, class_num))
         self.connection.commit()
 
     def insert_teacher(self, name):
