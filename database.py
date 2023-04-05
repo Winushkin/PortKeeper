@@ -16,6 +16,7 @@ class DataBase:
         CREATE TABLE IF NOT EXISTS students ( 
             student_id           INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT ,
             name                 TEXT NOT NULL                                ,
+            login                TEXT NOT NUll                                ,
             password             TEXT NOT NULL                                ,
             avatar               BLOB                                         ,
             birth_date           DATE                                         ,
@@ -106,9 +107,9 @@ class DataBase:
 
 
 
-    def insert_student(self, name, password, teacher_id, learn_class):
-        sql = f"""INSERT INTO students (name, password, teacher_id, class) VALUES (?, ? ,?, ?)"""
-        self.cursor.execute(sql, (name, password, teacher_id, learn_class))
+    def insert_student(self, name, login, password, teacher_id, learn_class):
+        sql = f"""INSERT INTO students (name, login, password, teacher_id, class) VALUES (?, ?, ? ,?, ?)"""
+        self.cursor.execute(sql, (name, login, password, teacher_id, learn_class))
         self.connection.commit()
 
     def insert_teacher(self, name):

@@ -4,6 +4,7 @@ from flask import Flask, render_template, redirect, session, request, send_from_
 from forms.login_form import LoginForm
 from database import DataBase
 from forms.StudentAdd_form import AddStudents
+from login_generator import generate_login
 
 
 UPLOAD_FOLDER = './static/files'
@@ -91,13 +92,13 @@ def profile_by_id(student_id):
     student = db.get_student_by_student_id(student_id)
     portfolio = db.get_portfolio_by_student_id(student_id)
     exams = db.get_exams_by_student_id(student_id)
-    exams.reverse()
     if request.method == "POST":
         db.delete_exams(student_id)
         for i in range(1, 5):
             subject = request.form.get("exam" + str(i))
             mark = request.form.get("mark" + str(i))
             db.insert_exams(subject, mark, student_id)
+        exams = db.get_exams_by_student_id(student_id)
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
                            exams=exams, subjects=exams_subjects)
 
@@ -108,7 +109,6 @@ def profile():
     student = db.get_student_by_student_id(student_id)
     portfolio = db.get_portfolio_by_student_id(student_id)
     exams = db.get_exams_by_student_id(student_id)
-
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio, exams=exams)
 
 
@@ -149,9 +149,10 @@ def add_student():
     if "teacher_id" in session:
         if form.validate_on_submit():
             name = form.student.data
+            login = generate_login(name)
             class_num = form.class_number.data
             password = db.generate_password_for_user()
-            db.insert_student(name, password, session["teacher_id"], class_num)
+            db.insert_student(name, login, password, session["teacher_id"], class_num)
             return redirect("classes")
     else:
         return redirect("index")
