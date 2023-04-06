@@ -19,50 +19,58 @@
               </tr>
             </thead>
             <tbody>
-                {% if "teacher_id" in session %}
-                    {% for i in range(1, 5) %}
-                      <tr>
-                        <td>
-
-                            {% if exams %}
-                              <select name="exam{{i}}">
-                                {% for subject in range(19) %}
-                                    {% if subjects[subject] == exams[i-1][1] %}
-                                      <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
-                                    {% else %}
-                                      <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
-                                    {% endif %}
-                                {% endfor %}
-                              </select>
+              {% if "teacher_id" in session %}
+                {% for i in range(1, 5) %}
+                  <tr>
+                    {% if exams %}
+                      <td>
+                        <select name="exam{{i}}">
+                          {% for subject in range(19) %}
+                            {% if subjects[subject] == exams[i-1][1] %}
+                              <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
                             {% else %}
-                          <select name="exam{{i}}">
-                              {% for subject in range(19) %}
-                                {% if subjects[subject] == i %}
-                                  <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
-                                {% else %}
-                                  <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
-                                {% endif %}
-                              {% endfor %}
+                              <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
                             {% endif %}
-                          </select>
-                        </td>
-                        <td>
-                          <select name="mark{{i}}">
-                            {% for mark in range(1, 6) %}
-                                {% if mark == exams[i-1][2] %}
-                                  <option value={{mark}} selected>{{mark}}</option>
-                                {% else %}
-                                  <option value={{mark}}>{{mark}}</option>
-                                {% endif %}
-                            {% endfor %}
-                          </select>
-                        </td>
-                      </tr>
-                    {% endfor %}
+                          {% endfor %}
+                        </select>
+                      </td>
+                      <td>
+                        <select name="mark{{i}}">
+                          {% for mark in range(1, 6) %}
+                            {% if mark == exams[i-1][2] %}
+                              <option value={{mark}} selected>{{mark}}</option>
+                            {% else %}
+                              <option value={{mark}}>{{mark}}</option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      </td>
+                    {% else %}
+                      <td>
+                        <select name="exam{{i}}">
+                          {% for subject in range(19) %}
+                            {% if subject == i - 1 %}
+                              <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
+                            {% else %}
+                              <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      </td>
+                      <td>
+                        <select name="mark{{i}}">
+                            <option disabled selected></option>
+                          {% for mark in range(1, 6) %}
+                            <option value={{mark}}>{{mark}}</option>
+                          {% endfor %}
+                        </select>
+                      </td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
 
-                  {% elif "student_id" in session %}
-
-
+                {% elif "student_id" in session %}
+                  {% if exams %}
                     {% for exam in exams %}
                       <tr>
                         <td>
@@ -73,7 +81,10 @@
                         </td>
                       </tr>
                     {% endfor %}
+                  {% else %}
+                    <p>Предметы не выбраны</p>
                   {% endif %}
+                {% endif %}
             </tbody>
           </table>
           {% if "teacher_id" in session %}
