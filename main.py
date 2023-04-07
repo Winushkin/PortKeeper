@@ -93,24 +93,37 @@ def profile_by_id(student_id):
     portfolio = db.get_portfolio_by_student_id(student_id)
     exams = db.get_exams_by_student_id(student_id)
     if request.method == "POST":
+        db.update_students_novelty(student_id)
         db.delete_exams(student_id)
         for i in range(1, 5):
             subject = request.form.get("exam" + str(i))
             mark = request.form.get("mark" + str(i))
             db.insert_exams(subject, mark, student_id)
         exams = db.get_exams_by_student_id(student_id)
-    print(exams)
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
-                           exams=exams, subjects=exams_subjects)
+                                                exams=exams, subjects=exams_subjects, old = student[-1])
 
 
-@app.route("/profile")
+@app.route("/profile", methods=["POST", "GET"])
 def profile():
+    exams_subjects = ["Русский язык", "Литература", "Алгебра", "Геометрия", "Информатика", "Музыка",
+                      "ОБЖ", "Физическая культура", "Технология", "Английский язык", "Литература Республики Коми",
+                      "История", "Родная (русская) литература", "Родной (русский) язык", "Биология",
+                      "Химия", "Физика", "География", "Обществознание"]
     student_id = session["student_id"]
     student = db.get_student_by_student_id(student_id)
     portfolio = db.get_portfolio_by_student_id(student_id)
     exams = db.get_exams_by_student_id(student_id)
-    return render_template("student-profile.html", title="Student profile", student=student, port=portfolio, exams=exams)
+    if request.method == "POST":
+        db.update_students_novelty(student_id)
+        db.delete_exams(student_id)
+        for i in range(1, 5):
+            subject = request.form.get("exam" + str(i))
+            mark = request.form.get("mark" + str(i))
+            db.insert_exams(subject, mark, student_id)
+        exams = db.get_exams_by_student_id(student_id)
+    return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
+                                                exams=exams, subjects=exams_subjects, old=student[-1])
 
 
 @app.route("/info")
@@ -153,7 +166,7 @@ def add_student():
             login = generate_login(name)
             class_num = form.class_number.data
             password = db.generate_password_for_user()
-            db.insert_student(name, login, password, session["teacher_id"], class_num)
+            db.insert_student(name, login, password, session["teacher_id"], class_num, 0)
             return redirect("classes")
     else:
         return redirect("index")
