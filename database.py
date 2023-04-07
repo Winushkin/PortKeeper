@@ -24,6 +24,7 @@ class DataBase:
             class                TEXT NOT NULL                                ,
             teacher_id           INTEGER NOT NULL                             ,
             event_time           TEXT NOT NULL                                ,
+            old                  INTEGER NOT NULL                             ,
             FOREIGN KEY ( teacher_id ) REFERENCES teachers( teacher_id ) ON DELETE CASCADE ON UPDATE CASCADE
         );
         """
@@ -107,10 +108,20 @@ class DataBase:
 
 
 
-    def insert_student(self, name, login, password, teacher_id, class_num):
-        sql = f"""INSERT INTO students (name, login, password, teacher_id, class) VALUES (?, ?, ? ,?, ?)"""
-        self.cursor.execute(sql, (name, login, password, teacher_id, class_num))
+    def insert_student(self, name, login, password, teacher_id, class_num, old):
+        sql = """INSERT INTO students (name, login, password, teacher_id, class, old) 
+                 VALUES (?, ?, ? ,?, ?, ?)"""
+        self.cursor.execute(sql, (name, login, password, teacher_id, class_num, old))
         self.connection.commit()
+
+
+    def update_students_novelty(self, student_id):
+        sql = """UPDATE students
+                 SET old = 1
+                 WHERE student_id = ?"""
+        self.cursor.execute(sql, (student_id, ))
+        self.connection.commit()
+
 
     def insert_teacher(self, name):
         password = self.generate_password_for_user()
