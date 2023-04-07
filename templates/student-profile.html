@@ -22,7 +22,7 @@
               {% if "teacher_id" in session %}
                 {% for i in range(1, 5) %}
                   <tr>
-                    {% if exams %}
+                    {% if old %}
                       <td>
                         <select name="exam{{i}}">
                           {% for subject in range(19) %}
@@ -46,6 +46,7 @@
                         </select>
                       </td>
                     {% else %}
+
                       <td>
                         <select name="exam{{i}}">
                           {% for subject in range(19) %}
@@ -69,25 +70,42 @@
                   </tr>
                 {% endfor %}
 
-                {% elif "student_id" in session %}
-                  {% if exams %}
-                    {% for exam in exams %}
-                      <tr>
-                        <td>
-                          <p>{{exam[1]}}</p>
-                        </td>
-                        <td>
-                          <p>{{exam[2]}}</p>
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  {% else %}
-                    <p>Предметы не выбраны</p>
-                  {% endif %}
+              {% elif "student_id" in session %}
+                {% if old %}
+                  {% for exam in exams %}
+                    <tr>
+                      <td>
+                        <p>{{exam[1]}}</p>
+                      </td>
+                      <td>
+                        <p>{{exam[2]}}</p>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  {% for i in range(1, 5) %}
+                    <tr>
+                      <td>
+                        <select name="exam{{i}}">
+                          {% for subject in range(19) %}
+                            {% if subject == i - 1 %}
+                              <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
+                            {% else %}
+                              <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      </td>
+                      <td>
+                        <p></p>
+                      </td>
+                    </tr>
+                  {% endfor %}
                 {% endif %}
+              {% endif %}
             </tbody>
           </table>
-          {% if "teacher_id" in session %}
+          {% if "teacher_id" in session or not old %}
             <button class="button-c button-plus btn-save"><strong>Сохранить</strong></button>
           {% endif %}
         </form>
