@@ -1,7 +1,5 @@
 import datetime
 import sqlite3
-from password_generator import PasswordGenerator
-
 
 class DataBase:
     def __init__(self, db_name):
@@ -149,16 +147,7 @@ class DataBase:
         self.cursor.execute(sql, (student_id, ))
         self.connection.commit()
 
-    @staticmethod
-    def generate_password_for_user():
-        pwo = PasswordGenerator()
-        pwo.minlen = 8
-        pwo.maxlen = 8
-        pwo.minuchars = 2
-        pwo.minlchars = 2
-        pwo.minnumbers = 2
-        pwo.minschars = 2
-        return pwo.generate()
+
 
 
 if __name__ == '__main__':
