@@ -5,6 +5,7 @@ from forms.login_form import LoginForm
 from database import DataBase
 from forms.StudentAdd_form import AddStudents
 from added_files.login_generator import generate_login
+from added_files.password_generator import generate_password
 
 
 UPLOAD_FOLDER = './static/files'
@@ -100,8 +101,9 @@ def profile_by_id(student_id):
             mark = request.form.get("mark" + str(i))
             db.insert_exams(subject, mark, student_id)
         exams = db.get_exams_by_student_id(student_id)
+        student = db.get_student_by_student_id(student_id)
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
-                                                exams=exams, subjects=exams_subjects, old = student[-1])
+                                                exams=exams, subjects=exams_subjects, old = student[-1], N=None)
 
 
 @app.route("/profile", methods=["POST", "GET"])
@@ -122,8 +124,9 @@ def profile():
             mark = request.form.get("mark" + str(i))
             db.insert_exams(subject, mark, student_id)
         exams = db.get_exams_by_student_id(student_id)
+        student = db.get_student_by_student_id(student_id)
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
-                                                exams=exams, subjects=exams_subjects, old=student[-1])
+                                                exams=exams, subjects=exams_subjects, old=student[-1], N=None)
 
 
 @app.route("/info")
@@ -165,7 +168,7 @@ def add_student():
             name = form.student.data
             login = generate_login(name)
             class_num = form.class_number.data
-            password = db.generate_password_for_user()
+            password = generate_password()
             db.insert_student(name, login, password, session["teacher_id"], class_num, 0)
             return redirect("classes")
     else:

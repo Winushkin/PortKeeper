@@ -39,6 +39,8 @@
                           {% for mark in range(1, 6) %}
                             {% if mark == exams[i-1][2] %}
                               <option value={{mark}} selected>{{mark}}</option>
+                            {% elif mark == None %}
+                              <option value="" selected disabled></option>
                             {% else %}
                               <option value={{mark}}>{{mark}}</option>
                             {% endif %}
@@ -78,7 +80,11 @@
                         <p>{{exam[1]}}</p>
                       </td>
                       <td>
-                        <p>{{exam[2]}}</p>
+                        {% if mark == N %}
+                          <p></p>
+                        {% else %}
+                          <p>{{exam[2]}}</p>
+                        {% endif %}
                       </td>
                     </tr>
                   {% endfor %}
