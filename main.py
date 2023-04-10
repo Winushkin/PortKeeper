@@ -6,9 +6,11 @@ from database import DataBase
 from forms.StudentAdd_form import AddStudents
 from added_files.login_generator import generate_login
 from added_files.password_generator import generate_password
+from added_files.zipper import file_zipping
 
 
 UPLOAD_FOLDER = './static/files'
+DOWNLOAD_FOLDER = './static/files'
 ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg']
 
 app = Flask(__name__)
@@ -177,9 +179,18 @@ def add_student():
 
 @app.route("/download/<string:file_uuid>")
 def download_file(file_uuid):
-    filename = file_uuid
-
+    if "teacher_id" in session or "student_id" in session:
+        filename = file_uuid
     return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+
+
+@app.route("/profile/download-all/<string:student_id>")
+def download_zip(student_id):
+    if "teacher_id" in session or "student_id" in session:
+        portfolio = db.get_portfolio_by_student_id(student_id)
+        archive = file_zipping(portfolio)
+
+    return send_from_directory(DOWNLOAD_FOLDER, archive, as_attachment=True)
 
 
 if __name__ == "__main__":
