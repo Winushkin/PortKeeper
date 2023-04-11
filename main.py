@@ -6,7 +6,7 @@ from database import DataBase
 from forms.StudentAdd_form import AddStudents
 from added_files.login_generator import generate_login
 from added_files.password_generator import generate_password
-from added_files.zipper import file_zipping
+from added_files.zipper import file_zipping, zip_delete
 
 
 UPLOAD_FOLDER = './static/files'
@@ -189,9 +189,9 @@ def download_zip(student_id):
     if "teacher_id" in session or "student_id" in session:
         portfolio = db.get_portfolio_by_student_id(student_id)
         archive = file_zipping(portfolio)
-
-    return send_from_directory(DOWNLOAD_FOLDER, archive, as_attachment=True)
-
+        zip_sender = send_from_directory(DOWNLOAD_FOLDER, archive, as_attachment=True)
+        zip_delete(archive)
+        return zip_sender
 
 if __name__ == "__main__":
     app.run(debug=True)
