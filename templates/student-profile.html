@@ -62,7 +62,7 @@
                       </td>
                       <td>
                         <select name="mark{{i}}">
-                            <option disabled selected></option>
+                          <option disabled selected></option>
                           {% for mark in range(1, 6) %}
                             <option value={{mark}}>{{mark}}</option>
                           {% endfor %}
@@ -77,13 +77,13 @@
                   {% for exam in exams %}
                     <tr>
                       <td>
-                        <p>{{exam[1]}}</p>
+                        <p>{{ exam[1] }}</p>
                       </td>
                       <td>
-                        {% if mark == N %}
+                        {% if not exam[2] %}
                           <p></p>
                         {% else %}
-                          <p>{{exam[2]}}</p>
+                          <p>{{ exam[2] }}</p>
                         {% endif %}
                       </td>
                     </tr>
@@ -117,57 +117,60 @@
         </form>
       </div>
 
-<!--     выше идеальный код ------------------------- -->
+<!-- ----- портфолио ------------------------- -->
 
       {% if port %}
-      <p class="header-page"><strong>Сводная ведомость достижений учащегося (Олимпиады)</strong></p>
-      <div class="marks-tb">
-        <table class="marks-2">
-
-          <thead>
-            <tr>
-              <th class="th-2">Уровень</th>
-              <th class="th-2">Предмет</th>
-              <th class="th-2">Название</th>
-              <th class="th-2">Дата</th>
-              <th class="th-2">Результаты</th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for item in port %}
-            <tr>
-              <td class="td-2">{{item[6]}}</td>
-              <td class="td-2">{{item[2]}}</td>
-              <td class="td-2">{{item[1]}}</td>
-              <td class="td-2">{{item[-1]}}</td>
-              <td class="td-2">{{item[-2]}}</td>
-            </tr>
-          {% endfor %}
-
-          </tbody>
-        </table>
-      </div>
-        {% if "student_id" in session %}
-        <a href="/add-portfolio" type="submit" class="button-center button-add"><strong>Добавить достижение</strong></a>
-        {% endif %}
-      <p class="header-page"><strong>Достижения:</strong></p>
-      <div class="portfolio-files">
-
-        {% for item in port %}
-        <div class="portfolio-item">
-          <img src={{url_for('static', filename='files/' + item[5])}} alt="" class="portfolio-image">
-          <p class="portfolio-title">{{item[1]}}</p>
-          <a href='/download/{{ item[5] }}' class="portfolio-link">скачать</a>
+        <p class="header-page"><strong>Сводная ведомость достижений учащегося (Олимпиады)</strong></p>
+        <div class="marks-tb">
+          <table class="marks-2">
+            <thead>
+              <tr>
+                <th class="th-2">Уровень</th>
+                <th class="th-2">Предмет</th>
+                <th class="th-2">Название</th>
+                <th class="th-2">Дата</th>
+                <th class="th-2">Результаты</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in port %}
+                <tr>
+                  <td class="td-2">{{item[6]}}</td>
+                  <td class="td-2">{{item[2]}}</td>
+                  <td class="td-2">{{item[1]}}</td>
+                  <td class="td-2">{{item[-1]}}</td>
+                  <td class="td-2">{{item[-2]}}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-        {% endfor %}
-      </div>
+
+        {% if "student_id" in session %}
+          <a href="/add-portfolio" type="submit" class="button-center button-add"><strong>Добавить достижение</strong></a>
+        {% endif %}
+        <p class="header-page"><strong>Достижения:</strong></p>
+        <a href='/profile/download-all/{{student[0]}}' class="portfolio-link">Скачать Всё</a>
+
+        <div class="portfolio-files">
+          {% for item in port %}
+            <div class="portfolio-item">
+              {% if item[5].split(".")[-1] == "pdf" %}
+                {% set file = item[5][:-4] + "-miniature.jpg" %}
+                <img src={{url_for('static', filename='files/' + file)}} alt="" class="portfolio-image">
+              {% else %}
+                <img src={{url_for('static', filename='files/' + item[5])}} alt="" class="portfolio-image">
+              {% endif %}
+              <p class="portfolio-title">{{item[1]}}</p>
+              <a href='/download/{{ item[5] }}' class="portfolio-link">Cкачать</a>
+            </div>
+          {% endfor %}
+        </div>
       {% else %}
         {% if "student_id" in session %}
         <a href="/add-portfolio" type="submit" class="button-center button-add"><strong>Добавить достижение</strong></a>
         {% endif %}
       {% endif %}
-
     </div>
-
   </section>
 {% endblock %}

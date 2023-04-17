@@ -1,5 +1,7 @@
 import os
 import uuid
+
+import fitz
 from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for
 from forms.login_form import LoginForm
 from database import DataBase
@@ -149,8 +151,15 @@ def add_port():
         random_uuid = str(uuid.uuid4()) + file_expansion
 
         if uploaded_file and allowed_file(uploaded_file.filename):
-            uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'],
-                                            random_uuid))
+            uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], random_uuid))
+            if file_expansion == ".pdf":
+                uploaded_file = fitz.open(f"./static/files/{random_uuid}")
+                for page in uploaded_file:
+                    pdf_image = page.get_pixmap(matrix=fitz.Identity, dpi=None,
+                                          colorspace=fitz.csRGB, clip=None, alpha=True, annots=True)
+                pdf_image.save(os.path.join(app.config['UPLOAD_FOLDER'], random_uuid.split(".")[0] + "-miniature.jpg"))
+
+
             db.insert_portfolio(name, subject, int(session["student_id"]), random_uuid, level, result, date)
             return redirect(url_for("profile"))
 
