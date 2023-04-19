@@ -1,14 +1,15 @@
 import os
 import uuid
-
 import fitz
-from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for
-from forms.login_form import LoginForm
+from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for, flash
 from database import DataBase
+from forms.registration_form import RegistrationForm
+from forms.login_form import LoginForm
 from forms.StudentAdd_form import AddStudents
 from added_files.login_generator import generate_login
 from added_files.password_generator import generate_password
 from added_files.zipper import file_zipping, zip_delete
+
 
 
 UPLOAD_FOLDER = './static/files'
@@ -201,6 +202,21 @@ def download_zip(student_id):
         zip_sender = send_from_directory(DOWNLOAD_FOLDER, archive, as_attachment=True)
         zip_delete(archive)
         return zip_sender
+
+
+@app.route("/registration", methods=["POST", "GET"])
+def registration():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        class_code = form.class_code.data
+        login = form.login.data
+        is_uniq_login = db.check_uniq_login(login)
+        if not is_uniq_login:
+            flash("Логин уже существует. Придумайте другой")
+        else:
+            pass
+
+    return render_template("student_registration.html", title="registration", form=form)
 
 if __name__ == "__main__":
     app.run(debug=True)

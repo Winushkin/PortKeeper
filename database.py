@@ -148,6 +148,12 @@ class DataBase:
         self.connection.commit()
 
 
+    def check_uniq_login(self, login):
+        sql = """SELECT * FROM students
+                 WHERE login = ?"""
+        self.cursor.execute(sql, (login, ))
+        self.connection.commit()
+
 
 
 if __name__ == '__main__':

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+     <section class="auth-page">
+        <form action="" method="post">
+            {{form.hidden_tag()}}
+            <p class="tittle-auth"><strong>Зарегистрироваться</strong></p>
+
+            {{form.class_code(class='string')}}
+            {% for error in form.class_code.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+
+            {{form.login()}}
+            {% for error in form.login.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <ul class="flashes">
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+
+            {{form.password()}}
+            {% for error in form.password.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+
+            {{ form.submit(class="button-3") }}
+        </form>
+    </section>
+{% endblock %}

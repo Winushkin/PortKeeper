@@ -13,3 +13,5 @@ def translator(string: str) -> str:
         translated_text = translated_text.replace("IY", "Y", 1)
     return translated_text.lower().capitalize()
 
+
+
