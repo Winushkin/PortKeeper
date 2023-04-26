@@ -2,6 +2,7 @@ import os
 import uuid
 import fitz
 from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for, flash
+
 from database import DataBase
 from forms.registration_form import RegistrationForm
 from forms.login_form import LoginForm
