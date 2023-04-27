@@ -1,15 +1,16 @@
 import os
 import uuid
 import fitz
-from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for, flash
+from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for, flash, make_response
 
 from database import DataBase
-from forms.registration_form import RegistrationForm
 from forms.login_form import LoginForm
 from forms.StudentAdd_form import AddStudents
 from added_files.login_generator import generate_login
 from added_files.password_generator import generate_password
 from added_files.zipper import file_zipping, zip_delete
+from flask_restful import reqparse, abort, Api, Resource
+
 
 
 
@@ -18,10 +19,11 @@ DOWNLOAD_FOLDER = './static/files'
 ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg']
 
 app = Flask(__name__)
+api = Api(app)
 app.config["SECRET_KEY"] = "q1w2e3r4t5y"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-db = DataBase("base.sqlite3")
+db = DataBase("database/base.sqlite3")
 db.create_tables()
 
 def allowed_file(filename):
@@ -50,14 +52,15 @@ def teacher_login():
         return redirect("classes")
     form = LoginForm()
     if form.validate_on_submit():
-        name = form.login.data
+        login = form.login.data
         password = form.password.data
-        teacher = db.get_teacher(name, password)
+        teacher = db.get_teacher(login, password)
         if teacher:
             session["teacher_id"] = teacher[0]
-            session["login"] = teacher[1]
-            session["avatar"] = teacher[3]
-            session["post"] = "учитель информатики"
+            session["name"] = teacher[1]
+            session["login"] = teacher[2]
+            session["avatar"] = teacher[5]
+            session["post"] = teacher[4]
             return redirect("classes")
     return render_template("teacher-login.html", form=form, title="Teacher Login")
 
@@ -75,19 +78,28 @@ def student_login():
         student = db.get_student(login, password)
         if student:
             session["student_id"] = student[0]
-            session["login"] = student[1]
-            session["avatar"] = student[3]
-            session["class"] = student[6]
+            session["name"] = student[1]
+            print(session["name"])
+            session["login"] = student[2]
+            session["avatar"] = student[4]
+            session["birth-date"] = student[5]
+            session["class"] = student[7]
             return redirect(url_for("profile"))
     return render_template("student-login.html", form=form, title="Student Login")
 
 
-@app.route("/classes")
+@app.route("/classes", methods=["GET", "POST"])
 def classes():
-    if "teacher_id" not in session:
+    if "teacher_id" not in session or "student_id" in session:
         return redirect("index")
+    if request.method == "POST":
+        uploaded_file = request.files['file']
+        bytes = uploaded_file.read()
+        db.insert_teachers_avatar(bytes, session["teacher_id"],)
     students = db.get_students_by_teacher_id(session["teacher_id"])
-    return render_template("classes.html", students=students, title="Teacher profile")
+    if db.get_students_by_student_id(session["student_id"]):
+        avatar = True
+    return render_template("classes.html", students=students, title="Teacher profile", avatar=avatar)
 
 
 @app.route("/profile/<student_id>", methods=["POST", "GET"])
@@ -204,20 +216,34 @@ def download_zip(student_id):
         zip_delete(archive)
         return zip_sender
 
+@app.route("/user_avatar")
+def user_avatar():
+    if "teacher_id" in session:
+        current_user = db.get_teacher_by_teacher_id(session["teacher_id"])
+        img = current_user[5]
+    if "student_id" in session:
+        current_user = db.get_student_by_student_id(session["student_id"])
+        img = current_user[4]
+    if not img:
+        return ""
+    h = make_response(img)
+    h.headers['Content-Type'] = 'image/png'
+    return h
 
-@app.route("/registration", methods=["POST", "GET"])
-def registration():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        class_code = form.class_code.data
-        login = form.login.data
-        is_uniq_login = db.check_uniq_login(login)
-        if not is_uniq_login:
-            flash("Логин уже существует. Придумайте другой")
-        else:
-            pass
 
-    return render_template("student_registration.html", title="registration", form=form)
+# @app.route("/registration", methods=["POST", "GET"])
+# def registration():
+#     form = RegistrationForm()
+#     if form.validate_on_submit():
+#         class_code = form.class_code.data
+#         login = form.login.data
+#         is_uniq_login = db.check_uniq_login(login)
+#         if not is_uniq_login:
+#             flash("Логин уже существует. Придумайте другой")
+#         else:
+#             pass
+#
+#     return render_template("student_registration.html", title="registration", form=form)
 
 if __name__ == "__main__":
     app.run(debug=True)
