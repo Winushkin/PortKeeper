@@ -30,13 +30,16 @@ class DataBase:
 
         sql = """CREATE TABLE IF NOT EXISTS teachers ( 
             teacher_id           INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT,
-            name                 TEXT NOT NULL    ,
-            password             TEXT NOT NULL    ,
-            avatar               BLOB     ,
+            name                 TEXT NOT NULL  ,
+            login                TEXT NOT NULL  ,
+            password             TEXT NOT NULL  ,
+            post                 TEXT NOT NULL  ,
+            avatar               BLOB           ,
             created_at           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP   
         );
         """
         self.cursor.execute(sql)
+
         sql = """CREATE TABLE IF NOT EXISTS portfolio  ( 
             portfolio_id         INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT,
             event_name           TEXT NOT NULL    ,
@@ -49,6 +52,7 @@ class DataBase:
             FOREIGN KEY ( student_id ) REFERENCES students( student_id ) ON DELETE CASCADE ON UPDATE CASCADE
         );"""
         self.cursor.execute(sql)
+
         sql = """CREATE TABLE IF NOT EXISTS exams ( 
                     exam_id           INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT,
                     subject           TEXT,
@@ -62,30 +66,49 @@ class DataBase:
         self.cursor.execute(sql)
         self.connection.commit()
 
-    def get_portfolio_by_student_id(self, student_id):
-        sql = """SELECT * FROM portfolio WHERE student_id = ?"""
-        self.cursor.execute(sql, (student_id,))
-        return self.cursor.fetchall()
+
+#__________________________________________________________TEACHERS_____________________________________________________
+    def get_teacher(self, login, password):
+        sql = """SELECT * FROM teachers WHERE login = ? AND password = ?"""
+        self.cursor.execute(sql, (login, password))
+        result = self.cursor.fetchone()
+        if not result:
+            return None
+        return result
 
 
-    def get_exams_by_student_id(self, student_id):
-        sql = """SELECT * FROM exams WHERE student_id = ?"""
-        self.cursor.execute(sql, (student_id,))
-        return self.cursor.fetchall()
+    def get_teacher_by_teacher_id(self, teacher_id):
+        sql = """SELECT * FROM teachers WHERE teacher_id =?"""
+        self.cursor.execute(sql, (teacher_id,))
+        result = self.cursor.fetchone()
+        if not result:
+            return None
+        return result
 
+    def insert_teachers_avatar(self, avatar, teacher_id):
+        sql = """UPDATE teachers 
+                 SET avatar = ?
+                 WHERE teacher_id = ?"""
+        self.cursor.execute(sql, (avatar, teacher_id))
+        self.connection.commit()
+
+
+    def insert_teacher(self, name):
+        password = self.generate_password_for_user()
+        sql = """INSERT INTO teachers (name, password) VALUES (?, ?)"""
+        self.cursor.execute(sql, (name, password))
+        self.connection.commit()
+
+
+
+
+#_______________________________________________________STUDENTS________________________________________________________
 
     def get_students_by_teacher_id(self, teacher_id):
         sql = """SELECT * FROM students WHERE teacher_id = ?"""
         self.cursor.execute(sql, (teacher_id,))
         return self.cursor.fetchall()
 
-    def get_teacher(self, name, password):
-        sql = """SELECT * FROM teachers WHERE password = ? AND name = ?"""
-        self.cursor.execute(sql, (password, name))
-        result = self.cursor.fetchone()
-        if not result:
-            return None
-        return result
 
     def get_student(self, login, password):
         sql = """SELECT * FROM students WHERE password = ? AND login = ?"""
@@ -104,28 +127,28 @@ class DataBase:
             return None
         return result
 
-
-
     def insert_student(self, name, login, password, teacher_id, class_num, old):
         sql = """INSERT INTO students (name, login, password, teacher_id, class, old) 
                  VALUES (?, ?, ? ,?, ?, ?)"""
         self.cursor.execute(sql, (name, login, password, teacher_id, class_num, old))
         self.connection.commit()
 
-
     def update_students_novelty(self, student_id):
         sql = """UPDATE students
                  SET old = 1
                  WHERE student_id = ?"""
-        self.cursor.execute(sql, (student_id, ))
+        self.cursor.execute(sql, (student_id,))
         self.connection.commit()
 
 
-    def insert_teacher(self, name):
-        password = self.generate_password_for_user()
-        sql = """INSERT INTO teachers (name, password) VALUES (?, ?)"""
-        self.cursor.execute(sql, (name, password))
-        self.connection.commit()
+#_______________________________________________________PORTFOLIO_______________________________________________________
+
+
+    def get_portfolio_by_student_id(self, student_id):
+        sql = """SELECT * FROM portfolio WHERE student_id = ?"""
+        self.cursor.execute(sql, (student_id,))
+        return self.cursor.fetchall()
+
 
     def insert_portfolio(self, event_name, event_type, student_id, event_file_uuid ,event_level, event_result, event_date):
         sql = """INSERT INTO portfolio (event_name, event_type, student_id, 
@@ -135,18 +158,29 @@ class DataBase:
         self.connection.commit()
 
 
+#________________________________________________________EXAMS__________________________________________________________
+
+
+    def get_exams_by_student_id(self, student_id):
+        sql = """SELECT * FROM exams WHERE student_id = ?"""
+        self.cursor.execute(sql, (student_id,))
+        return self.cursor.fetchall()
+
+
     def insert_exams(self, subject, mark, student_id):
         sql = """INSERT INTO exams (subject, mark, student_id)
-                 VALUES (?, ?, ?)"""
+                  VALUES (?, ?, ?)"""
         self.cursor.execute(sql, (subject, mark, student_id))
         self.connection.commit()
 
+
     def delete_exams(self, student_id):
-        sql ="""DELETE FROM exams
-                WHERE student_id = ?"""
-        self.cursor.execute(sql, (student_id, ))
+        sql = """DELETE FROM exams
+                 WHERE student_id = ?"""
+        self.cursor.execute(sql, (student_id,))
         self.connection.commit()
 
+#________________________________________________________GENERAL________________________________________________________
 
     def check_uniq_login(self, login):
         sql = """SELECT * FROM students
@@ -157,5 +191,5 @@ class DataBase:
 
 
 if __name__ == '__main__':
-    db = DataBase("base.sqlite3")
+    db = DataBase("database/base.sqlite3")
     db.create_tables()
