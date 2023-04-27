@@ -1,7 +1,7 @@
 import os
 import uuid
 import fitz
-from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for, flash, make_response
+from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for, make_response
 
 from database import DataBase
 from forms.login_form import LoginForm
@@ -26,10 +26,28 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db = DataBase("database/base.sqlite3")
 db.create_tables()
 
+
+exams_subjects = ["Русский язык", "Литература", "Алгебра", "Геометрия", "Информатика", "Музыка",
+                      "ОБЖ", "Физическая культура", "Технология", "Английский язык", "Литература Республики Коми",
+                      "История", "Родная (русская) литература", "Родной (русский) язык", "Биология",
+                      "Химия", "Физика", "География", "Обществознание"]
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.split('.')[-1] in ALLOWED_EXTENSIONS
 
+
+#________________________________________________HEADER_________________________________________________________________
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect("index")
+
+
+@app.route("/info")
+def info():
+    return render_template("information.html", title="Information")
 
 @app.route("/")
 @app.route('/index')
@@ -40,10 +58,12 @@ def index():
         return redirect("profile")
     return render_template("index.html", title="Port-Keeper")
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect("index")
+
+@app.route("/support")
+def support():
+    return render_template("support.html", title="support")
+
+#___________________________________________________CONTENT_____________________________________________________________
 
 
 @app.route("/teacher-login", methods=["GET", "POST"])
@@ -59,7 +79,6 @@ def teacher_login():
             session["teacher_id"] = teacher[0]
             session["name"] = teacher[1]
             session["login"] = teacher[2]
-            session["avatar"] = teacher[5]
             session["post"] = teacher[4]
             return redirect("classes")
     return render_template("teacher-login.html", form=form, title="Teacher Login")
@@ -79,9 +98,7 @@ def student_login():
         if student:
             session["student_id"] = student[0]
             session["name"] = student[1]
-            print(session["name"])
             session["login"] = student[2]
-            session["avatar"] = student[4]
             session["birth-date"] = student[5]
             session["class"] = student[7]
             return redirect(url_for("profile"))
@@ -94,20 +111,16 @@ def classes():
         return redirect("index")
     if request.method == "POST":
         uploaded_file = request.files['file']
-        bytes = uploaded_file.read()
-        db.insert_teachers_avatar(bytes, session["teacher_id"],)
+        img_bytes = uploaded_file.read()
+        db.insert_teachers_avatar(img_bytes, session["teacher_id"],)
     students = db.get_students_by_teacher_id(session["teacher_id"])
-    if db.get_students_by_student_id(session["student_id"]):
+    if db.get_students_by_teacher_id(session["teacher_id"]):
         avatar = True
     return render_template("classes.html", students=students, title="Teacher profile", avatar=avatar)
 
 
 @app.route("/profile/<student_id>", methods=["POST", "GET"])
 def profile_by_id(student_id):
-    exams_subjects = ["Русский язык", "Литература", "Алгебра", "Геометрия", "Информатика", "Музыка",
-                      "ОБЖ", "Физическая культура", "Технология", "Английский язык", "Литература Республики Коми",
-                      "История", "Родная (русская) литература", "Родной (русский) язык", "Биология",
-                      "Химия", "Физика", "География", "Обществознание"]
     student = db.get_student_by_student_id(student_id)
     portfolio = db.get_portfolio_by_student_id(student_id)
     exams = db.get_exams_by_student_id(student_id)
@@ -126,10 +139,6 @@ def profile_by_id(student_id):
 
 @app.route("/profile", methods=["POST", "GET"])
 def profile():
-    exams_subjects = ["Русский язык", "Литература", "Алгебра", "Геометрия", "Информатика", "Музыка",
-                      "ОБЖ", "Физическая культура", "Технология", "Английский язык", "Литература Республики Коми",
-                      "История", "Родная (русская) литература", "Родной (русский) язык", "Биология",
-                      "Химия", "Физика", "География", "Обществознание"]
     student_id = session["student_id"]
     student = db.get_student_by_student_id(student_id)
     portfolio = db.get_portfolio_by_student_id(student_id)
@@ -146,11 +155,37 @@ def profile():
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
                                                 exams=exams, subjects=exams_subjects, old=student[-1], N=None)
 
+@app.route("/add-student", methods=["POST", "GET"])
+def add_student():
+    form = AddStudents()
+    if "teacher_id" in session:
+        if form.validate_on_submit():
+            name = form.student_name.data
+            login = generate_login(name)
+            class_num = form.class_number.data
+            password = generate_password()
+            db.insert_student(name, login, password, session["teacher_id"], class_num, 0)
+            return redirect("classes")
+    else:
+        return redirect("index")
+    return render_template("add-students.html", title="new student", form=form)
 
-@app.route("/info")
-def info():
-    return render_template("information.html", title="Information")
 
+# @app.route("/registration", methods=["POST", "GET"])
+# def registration():
+#     form = RegistrationForm()
+#     if form.validate_on_submit():
+#         class_code = form.class_code.data
+#         login = form.login.data
+#         is_uniq_login = db.check_uniq_login(login)
+#         if not is_uniq_login:
+#             flash("Логин уже существует. Придумайте другой")
+#         else:
+#             pass
+#
+#     return render_template("student_registration.html", title="registration", form=form)
+
+#___________________________________________________FILES_______________________________________________________________
 
 @app.route("/add-portfolio", methods=["POST", "GET"])
 def add_port():
@@ -179,26 +214,6 @@ def add_port():
 
     return render_template("port-add-item.html", title="Add portfolio")
 
-
-@app.route("/support")
-def support():
-    return render_template("support.html", title="support")
-
-
-@app.route("/add-student", methods=["POST", "GET"])
-def add_student():
-    form = AddStudents()
-    if "teacher_id" in session:
-        if form.validate_on_submit():
-            name = form.student.data
-            login = generate_login(name)
-            class_num = form.class_number.data
-            password = generate_password()
-            db.insert_student(name, login, password, session["teacher_id"], class_num, 0)
-            return redirect("classes")
-    else:
-        return redirect("index")
-    return render_template("add-students.html", title="new student", form=form)
 
 @app.route("/download/<string:file_uuid>")
 def download_file(file_uuid):
@@ -230,20 +245,6 @@ def user_avatar():
     h.headers['Content-Type'] = 'image/png'
     return h
 
-
-# @app.route("/registration", methods=["POST", "GET"])
-# def registration():
-#     form = RegistrationForm()
-#     if form.validate_on_submit():
-#         class_code = form.class_code.data
-#         login = form.login.data
-#         is_uniq_login = db.check_uniq_login(login)
-#         if not is_uniq_login:
-#             flash("Логин уже существует. Придумайте другой")
-#         else:
-#             pass
-#
-#     return render_template("student_registration.html", title="registration", form=form)
 
 if __name__ == "__main__":
     app.run(debug=True)
