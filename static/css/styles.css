@@ -165,6 +165,7 @@ header {
 
 form {
     /* margin-left: 450px; */
+    margin-bottom: 20px;
     margin: 0 auto;
     max-width: 650px;
     /* margin-top: 100px; */
@@ -238,6 +239,25 @@ a {
     cursor: pointer;
     margin-top: 40px;
     margin-left: 100px;
+    transition: all ease 0.3s;
+}
+
+
+.button-4 {
+    width: 200px;
+    height: 70px;
+    background-color: #A15656;
+    /* border: none; */
+    color: white;
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    margin: 4px 2px;
+    cursor: pointer;
+    margin-top: 40px;
+    margin-left: 1px;
     transition: all ease 0.3s;
 }
 
