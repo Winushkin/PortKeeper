@@ -4,7 +4,6 @@ let tbody = document.querySelector(".marks-2 > tbody");
 
 let headers = document.querySelectorAll(".marks-2 th");
 
-
 headers.forEach(function(header){
     console.log(1)
     header.addEventListener("click", function(e){
