@@ -11,6 +11,8 @@ from added_files.password_generator import generate_password
 from added_files.zipper import file_zipping, zip_delete
 from flask_restful import reqparse, abort, Api, Resource
 
+from data import db_session
+
 
 
 
@@ -20,7 +22,7 @@ ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg']
 
 app = Flask(__name__)
 api = Api(app)
-app.config["SECRET_KEY"] = "q1w2e3r4t5y"
+app.config["SECRET_KEY"] = "hcgfgfgfghfghsfsddadad"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = DataBase("database/base.sqlite3")
@@ -248,3 +250,4 @@ def user_avatar():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    db_session.global_init("db/database.db")
