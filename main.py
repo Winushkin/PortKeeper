@@ -11,7 +11,7 @@ from added_files.password_generator import generate_password
 from added_files.zipper import file_zipping, zip_delete
 from flask_restful import reqparse, abort, Api, Resource
 
-from data import db_session
+#from data import db_session
 
 
 
@@ -208,7 +208,7 @@ def add_port():
                 for page in uploaded_file:
                     pdf_image = page.get_pixmap(matrix=fitz.Identity, dpi=None,
                                           colorspace=fitz.csRGB, clip=None, alpha=True, annots=True)
-                pdf_image.save(os.path.join(app.config['UPLOAD_FOLDER'], random_uuid.split(".")[0] + "-miniature.jpg"))
+                pdf_image.save(os.path.join(app.config['UPLOAD_FOLDER'], random_uuid.split(".")[0] + "-miniature.png"))
 
 
             db.insert_portfolio(name, subject, int(session["student_id"]), random_uuid, level, result, date)
@@ -250,4 +250,4 @@ def user_avatar():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    db_session.global_init("db/database.db")
+    #db_session.global_init("db/database.db")
