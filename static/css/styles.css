@@ -457,6 +457,7 @@ th:last-child, td:last-child {
     flex-direction: column;
     width: 20%;
     justify-content: flex-start;
+    align-items: center;
 }
 
 
@@ -552,11 +553,11 @@ th {
 
 
 
-/* .avatar-2 {
-    margin-top: 50px;
-    margin-left: 80px;
-} */
-
+.avatar-2 {
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+}
 
 .header-page {
     color: #FFFFFF;
@@ -917,3 +918,4 @@ select {
     border: 3px solid #8558587a;
     color: #724848;
 }
+
