@@ -122,7 +122,9 @@ header {
     color: black;
     margin-left: 40px;
 }
-
+th {
+    cursor: pointer;
+}
 
 .button-yellow:hover {
     box-shadow: 12px 12px 1px #848558;
