@@ -4,6 +4,7 @@ let tbody = document.querySelector(".marks-2 > tbody");
 
 let headers = document.querySelectorAll(".marks-2 th");
 
+
 headers.forEach(function(header){
     console.log(1)
     header.addEventListener("click", function(e){
@@ -27,10 +28,16 @@ headers.forEach(function(header){
             tbody.append(...sortedRows);
         }
         if (e.target.textContent == 'Дата') {
-            // .sort()
+            sortedRows.sort(function(a, b){
+                return new Date(a.cells[3].innerHTML) > new Date(b.cells[3].innerHTML) ? 1 : -1;
+            });
+            tbody.append(...sortedRows);
         }
         if (e.target.textContent == 'Результаты') {
-            // .sort()
+            sortedRows.sort(function(a, b){
+                return a.cells[4].innerHTML > b.cells[4].innerHTML ? 1 : -1;
+            });
+            tbody.append(...sortedRows);
         }
     });
 });
