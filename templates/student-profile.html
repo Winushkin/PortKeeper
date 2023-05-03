@@ -180,7 +180,7 @@
           {% for item in port %}
             <div class="portfolio-item">
               {% if item[5].split(".")[-1] == "pdf" %}
-                {% set file = item[5][:-4] + "-miniature.jpg" %}
+                {% set file = item[5][:-4] + "-miniature.png" %}
                 <img src={{url_for('static', filename='files/' + file)}} alt="" class="portfolio-image">
               {% else %}
                 <img src={{url_for('static', filename='files/' + item[5])}} alt="" class="portfolio-image">
