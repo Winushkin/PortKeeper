@@ -140,6 +140,9 @@ venv.bak/
 /site
 /database
 ./static/files/
+.jpg
+.pdf
+
 # mypy
 .mypy_cache/
 .dmypy.json

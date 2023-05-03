@@ -5,8 +5,8 @@
             {{form.hidden_tag()}}
             <p class="tittle-auth"><strong>Добавить ученика</strong></p>
 
-            {{form.student(class='login', placeholder="Введите ФИО ученика")}}
-            {% for error in form.student.errors %}
+            {{form.student_name(class='login', placeholder="Введите ФИО ученика")}}
+            {% for error in form.student_name.errors %}
                 <div class="error">{{ error }}</div>
             {% endfor %}
 

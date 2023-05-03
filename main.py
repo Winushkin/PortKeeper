@@ -1,18 +1,19 @@
 import os
 import uuid
 import fitz
+
 from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for, make_response
 
-from database import DataBase
 from forms.login_form import LoginForm
 from forms.StudentAdd_form import AddStudents
+
 from added_files.login_generator import generate_login
 from added_files.password_generator import generate_password
 from added_files.zipper import file_zipping, zip_delete
-from flask_restful import reqparse, abort, Api, Resource
 
-#from data import db_session
-
+from data import db_session
+from database import DataBase
+import site_api
 
 
 
@@ -20,8 +21,13 @@ UPLOAD_FOLDER = './static/files'
 DOWNLOAD_FOLDER = './static/files'
 ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg']
 
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.split('.')[-1] in ALLOWED_EXTENSIONS
+
+
 app = Flask(__name__)
-api = Api(app)
 app.config["SECRET_KEY"] = "hcgfgfgfghfghsfsddadad"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -34,9 +40,6 @@ exams_subjects = ["Русский язык", "Литература", "Алгеб
                       "История", "Родная (русская) литература", "Родной (русский) язык", "Биология",
                       "Химия", "Физика", "География", "Обществознание"]
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.split('.')[-1] in ALLOWED_EXTENSIONS
 
 
 #________________________________________________HEADER_________________________________________________________________
@@ -198,21 +201,19 @@ def add_port():
         date = request.form.get("date")
         result = request.form.get("result")
         uploaded_file = request.files["file"]
+
         file_expansion = "." + str(uploaded_file).split(".")[-1].split("'")[0]
         random_uuid = str(uuid.uuid4()) + file_expansion
-
         if uploaded_file and allowed_file(uploaded_file.filename):
-            uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], random_uuid))
+            uploaded_file.save(os.path.join(UPLOAD_FOLDER, random_uuid))
             if file_expansion == ".pdf":
                 uploaded_file = fitz.open(f"./static/files/{random_uuid}")
                 for page in uploaded_file:
                     pdf_image = page.get_pixmap(matrix=fitz.Identity, dpi=None,
-                                          colorspace=fitz.csRGB, clip=None, alpha=True, annots=True)
-                pdf_image.save(os.path.join(app.config['UPLOAD_FOLDER'], random_uuid.split(".")[0] + "-miniature.png"))
-
-
-            db.insert_portfolio(name, subject, int(session["student_id"]), random_uuid, level, result, date)
-            return redirect(url_for("profile"))
+                                                colorspace=fitz.csRGB, clip=None, alpha=True, annots=True)
+                pdf_image.save(os.path.join(UPLOAD_FOLDER, random_uuid.split(".")[0] + "-miniature.jpg"))
+        db.insert_portfolio(name, subject, int(session["student_id"]), level, random_uuid, result, date)
+        return redirect(url_for("profile"))
 
     return render_template("port-add-item.html", title="Add portfolio")
 
@@ -247,7 +248,9 @@ def user_avatar():
     h.headers['Content-Type'] = 'image/png'
     return h
 
+#_______________________________________________________________________________________________________________________
 
 if __name__ == "__main__":
+    app.register_blueprint(site_api.blueprint)
+#    db_session.global_init("db/database.db")
     app.run(debug=True)
-    #db_session.global_init("db/database.db")

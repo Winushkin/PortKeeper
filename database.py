@@ -4,6 +4,7 @@ import sqlite3
 class DataBase:
     def __init__(self, db_name):
         self.connection = sqlite3.connect(db_name, check_same_thread=False)
+#        self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
 
     def db_close(self):
@@ -41,14 +42,15 @@ class DataBase:
         self.cursor.execute(sql)
 
         sql = """CREATE TABLE IF NOT EXISTS portfolio  ( 
-            portfolio_id         INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT,
-            event_name           TEXT NOT NULL    ,
-            event_type           TEXT NOT NULL    ,
-            student_id           INTEGER NOT NULL    ,
-            created_at           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP   ,
-            event_file_uuid      TEXT     ,
-            event_level          TEXT     ,
-            event_result         TEXT     ,
+            portfolio_id         INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT   ,
+            event_name           TEXT NOT NULL                                  ,
+            event_type           TEXT NOT NULL                                  ,
+            student_id           INTEGER NOT NULL                               ,
+            created_at           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP    ,
+            file_uuid            BLOB                                           ,
+            event_level          TEXT                                           ,
+            event_result         TEXT                                           ,
+            event_date           TEXT                                           ,
             event_date           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY ( student_id ) REFERENCES students( student_id ) ON DELETE CASCADE ON UPDATE CASCADE
         );"""
@@ -151,11 +153,12 @@ class DataBase:
         return self.cursor.fetchall()
 
 
-    def insert_portfolio(self, event_name, event_type, student_id, event_file_uuid ,event_level, event_result, event_date):
-        sql = """INSERT INTO portfolio (event_name, event_type, student_id, 
-        event_file_uuid ,event_level, event_result, event_date) VALUES (?, ?, ?, ?, ?, ?, ?)
+    def insert_portfolio(self, event_name, event_type, student_id, event_level, file_uuid, event_result, event_date):
+        sql = """INSERT INTO portfolio (event_name, event_type, student_id, event_level, file_uuid, event_result, event_date)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)
         """
-        self.cursor.execute(sql, (event_name, event_type, student_id, event_file_uuid ,event_level, event_result, event_date))
+        self.cursor.execute(sql,
+                            (event_name, event_type, student_id ,event_level, file_uuid, event_result, event_date))
         self.connection.commit()
 
 
