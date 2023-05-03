@@ -49,6 +49,7 @@ class DataBase:
             event_file_uuid      TEXT     ,
             event_level          TEXT     ,
             event_result         TEXT     ,
+            event_date           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY ( student_id ) REFERENCES students( student_id ) ON DELETE CASCADE ON UPDATE CASCADE
         );"""
         self.cursor.execute(sql)
