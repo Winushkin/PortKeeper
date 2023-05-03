@@ -6,11 +6,20 @@
       <div class="student-card">
         <div class="student-info">
           {% if avatar %}
-            <img src={{url_for('user_avatar')}}  alt="avatar-1" class="avatar-2">
-          {% else %}
-            <img src={{url_for('static', filename="img/avatar 1.png")}}  alt="avatar-1" class="avatar-2">
-          {% endif %}
+                <img src={{url_for('user_avatar')}}
+                     alt="avatar-1"
+                     class="avatar-2"
+                />
+            {% else %}
+                <img src={{url_for('static', filename="img/avatar 1.png")}}
+                     alt="avatar-1"
+                     class="avatar-2"
+                />
+            {% endif %}
 
+
+          <p class="port-text">{{ student[1] }}</p>
+          <p class="port-text">Класс: {{ student[7] }}</p>
           <form action="" enctype="multipart/form-data" method="post">
                     <div class="upload-avatar__wrapper">
                         <input type="file"
@@ -30,8 +39,6 @@
                         <button class="button-4">поменять аватар</button>
                     </div>
                 </form>
-          <p class="port-text">{{ student[1] }}</p>
-          <p class="port-text">Класс: {{ student[7] }}</p>
         </div>
 
         <form class="student-table" method="post">
@@ -180,7 +187,7 @@
           {% for item in port %}
             <div class="portfolio-item">
               {% if item[5].split(".")[-1] == "pdf" %}
-                {% set file = item[5][:-4] + "-miniature.png" %}
+                {% set file = item[5][:-4] + "-miniature.jpg" %}
                 <img src={{url_for('static', filename='files/' + file)}} alt="" class="portfolio-image">
               {% else %}
                 <img src={{url_for('static', filename='files/' + item[5])}} alt="" class="portfolio-image">

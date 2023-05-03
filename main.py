@@ -28,7 +28,7 @@ def allowed_file(filename):
 
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "hcgfgfgfghfghsfsddadad"
+app.config["SECRET_KEY"] = "hello hachapuri"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = DataBase("database/base.sqlite3")
@@ -119,8 +119,10 @@ def classes():
         img_bytes = uploaded_file.read()
         db.insert_teachers_avatar(img_bytes, session["teacher_id"],)
     students = db.get_students_by_teacher_id(session["teacher_id"])
-    if db.get_students_by_teacher_id(session["teacher_id"]):
+    if db.get_students_by_teacher_id(session["teacher_id"])[5]:
         avatar = True
+    else:
+        avatar = False
     return render_template("classes.html", students=students, title="Teacher profile", avatar=avatar)
 
 
@@ -149,16 +151,27 @@ def profile():
     portfolio = db.get_portfolio_by_student_id(student_id)
     exams = db.get_exams_by_student_id(student_id)
     if request.method == "POST":
-        db.update_students_novelty(student_id)
-        db.delete_exams(student_id)
-        for i in range(1, 5):
-            subject = request.form.get("exam" + str(i))
-            mark = request.form.get("mark" + str(i))
-            db.insert_exams(subject, mark, student_id)
-        exams = db.get_exams_by_student_id(student_id)
-        student = db.get_student_by_student_id(student_id)
+        if "exam1" in request.form.keys():
+            db.update_students_novelty(student_id)
+            db.delete_exams(student_id)
+            for i in range(1, 5):
+                subject = request.form.get("exam" + str(i))
+                mark = request.form.get("mark" + str(i))
+                db.insert_exams(subject, mark, student_id)
+            exams = db.get_exams_by_student_id(student_id)
+            student = db.get_student_by_student_id(student_id)
+        else:
+            uploaded_file = request.files['file']
+            img_bytes = uploaded_file.read()
+            db.insert_student_avatar(img_bytes, session["student_id"])
+
+    if db.get_student_by_student_id(session["student_id"])[4]:
+        avatar = True
+    else:
+        avatar = False
+
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
-                                                exams=exams, subjects=exams_subjects, old=student[-1], N=None)
+                                                exams=exams, subjects=exams_subjects, old=student[-1], N=None, avatar=avatar)
 
 @app.route("/add-student", methods=["POST", "GET"])
 def add_student():
@@ -198,7 +211,7 @@ def add_port():
         name = request.form.get("name")
         level = request.form.get("level")
         subject = request.form.get("subject")
-        date = request.form.get("date")
+        date = ".".join(request.form.get("date").split("-")[::-1])
         result = request.form.get("result")
         uploaded_file = request.files["file"]
 

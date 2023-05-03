@@ -143,6 +143,12 @@ class DataBase:
         self.cursor.execute(sql, (student_id,))
         self.connection.commit()
 
+    def insert_student_avatar(self, avatar, student_id):
+        sql = """UPDATE students 
+                 SET avatar = ?
+                 WHERE student_id = ?"""
+        self.cursor.execute(sql, (avatar, student_id))
+        self.connection.commit()
 
 #_______________________________________________________PORTFOLIO_______________________________________________________
 
