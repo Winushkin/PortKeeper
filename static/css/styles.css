@@ -177,6 +177,9 @@ form {
     padding: 25px;
 }
 
+.form-add-avatar {
+    box-shadow: 0px 0px 0px #443C5B;
+}
 
 .tittle-auth {
     font-family: Inter, sans-serif;
