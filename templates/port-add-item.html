@@ -24,7 +24,16 @@
                 <input class="login" type="date" id="start" name="date" value="2023-05-04" 
                        min="2000-01-01" max="2023-12-31">
             </div>
-            <input class="login" type="text" placeholder="Результат(победа, участие, место и т.д.)" name="result">
+            <select name="result" class="login">
+                    <option disabled selected>Выберите результат</option>
+                    <option value="Победа">Победа</option>
+                    <option value="Участие">Участие</option>
+                    <option value="Призёр">Призёр</option>
+                    <option value="Прохождение">Прохождение</option>
+                    <option value="1 место">1 место</option>
+                    <option value="2 местт">2 место</option>
+                    <option value="3 место">3 место</option>
+                </select>
             </div>
 
             <div class="upload-file__wrapper">
