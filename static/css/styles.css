@@ -31,6 +31,16 @@ header {
 .link-a {
     font-variant: small-caps;
 }
+
+.header-nav-text {
+    /* margin-top: 25px; */
+    text-decoration: none;
+    color: white;
+    font-family: Inter;
+    font-size: 24px;
+    font-variant: small-caps;
+}
+
 .link-a:hover {
     text-decoration: underline;
     color: #ffffff68;
