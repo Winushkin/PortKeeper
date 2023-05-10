@@ -63,7 +63,7 @@ headers.forEach(function(header){
                 e.target.dataset.sort = "down"
             } else {
                 sortedRows.sort(function(a, b){
-                    return a.cells[3].innerHTML < b.cells[3].innerHTML ? 1 : -1;
+                    return new Date(a.cells[3].innerHTML) < new Date(b.cells[3].innerHTML) ? 1 : -1;
                 }); 
                 e.target.dataset.sort = 'up'
             } 
