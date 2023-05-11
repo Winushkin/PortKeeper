@@ -2,8 +2,8 @@ import os
 import uuid
 import fitz
 
-from flask import Flask, render_template, redirect, session, request, send_from_directory, url_for, make_response
-
+from flask import Flask, render_template, redirect, session, request, send_from_directory, \
+    url_for, make_response, abort
 from forms.login_form import LoginForm
 from forms.StudentAdd_form import AddStudents
 
@@ -14,7 +14,6 @@ from added_files.zipper import file_zipping, zip_delete
 from data import db_session
 from database import DataBase
 import site_api
-
 
 
 UPLOAD_FOLDER = './static/files'
@@ -41,8 +40,8 @@ exams_subjects = ["Русский язык", "Литература", "Алгеб
                       "Химия", "Физика", "География", "Обществознание"]
 
 
+# ________________________________________________HEADER_________________________________________________________________
 
-#________________________________________________HEADER_________________________________________________________________
 
 @app.route('/logout')
 def logout():
@@ -68,7 +67,7 @@ def index():
 def support():
     return render_template("support.html", title="support")
 
-#___________________________________________________CONTENT_____________________________________________________________
+# ___________________________________________________CONTENT_____________________________________________________________
 
 
 @app.route("/teacher-login", methods=["GET", "POST"])
@@ -203,7 +202,7 @@ def add_student():
 #
 #     return render_template("student_registration.html", title="registration", form=form)
 
-#___________________________________________________FILES_______________________________________________________________
+# ___________________________________________________FILES_______________________________________________________________
 
 @app.route("/add-portfolio", methods=["POST", "GET"])
 def add_port():
@@ -223,7 +222,7 @@ def add_port():
                 uploaded_file = fitz.open(f"./static/files/{random_uuid}")
                 for page in uploaded_file:
                     pdf_image = page.get_pixmap(matrix=fitz.Identity, dpi=None,
-                                                colorspace=fitz.csRGB, clip=None, alpha=True, annots=True)
+                                                colorspace=fitz.csRGB, clip=None, alpha=False, annots=True)
                 pdf_image.save(os.path.join(UPLOAD_FOLDER, random_uuid.split(".")[0] + "-miniature.jpg"))
         db.insert_portfolio(name, subject, int(session["student_id"]), level, random_uuid, result, date)
         return redirect(url_for("profile"))
@@ -247,6 +246,21 @@ def download_zip(student_id):
         zip_delete(archive)
         return zip_sender
 
+
+@app.route("/document/<string:filename>")
+def show_document(filename):
+    is_exist = db.check_portfolio(filename)
+    if is_exist:
+        h = make_response(open("./static/files/" + filename, "rb"))
+        exp = filename.split(".")[1]
+        if exp == "pdf":
+            h.headers['Content-Type'] = 'files/pdf'
+        else:
+            h.headers['Content-Type'] = "image/jpeg"
+        return h
+    abort(404)
+
+
 @app.route("/user_avatar")
 def user_avatar():
     if "teacher_id" in session:
@@ -258,10 +272,34 @@ def user_avatar():
     if not img:
         return ""
     h = make_response(img)
-    h.headers['Content-Type'] = 'image/png'
+    h.headers['Content-Type'] = 'image/jpg'
     return h
 
-#_______________________________________________________________________________________________________________________
+
+@app.route("/student_avatar/<string:student_id>")
+def student_avatar(student_id):
+    current_user = db.get_student_by_student_id(student_id)
+    img = current_user[4]
+    if not img:
+        return ""
+    h = make_response(img)
+    h.headers['Content-Type'] = 'image/jpg'
+    return h
+
+
+@app.route("/teacher_avatar/<string:teacher_id>")
+def teacher_avatar(teacher_id):
+    current_user = db.get_teacher_by_teacher_id(teacher_id)
+    img = current_user[5]
+    if not img:
+        return ""
+    h = make_response(img)
+    h.headers['Content-Type'] = 'image/jpg'
+    return h
+
+
+# _______________________________________________________________________________________________________________________
+
 
 if __name__ == "__main__":
     app.register_blueprint(site_api.blueprint)

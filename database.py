@@ -4,7 +4,7 @@ import sqlite3
 class DataBase:
     def __init__(self, db_name):
         self.connection = sqlite3.connect(db_name, check_same_thread=False)
-#        self.connection.row_factory = sqlite3.Row
+        self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
 
     def db_close(self):
@@ -152,6 +152,15 @@ class DataBase:
 
 #_______________________________________________________PORTFOLIO_______________________________________________________
 
+
+    def check_portfolio(self, filename):
+        sql = """SELECT * FROM portfolio
+                 WHERE file_uuid =?"""
+        self.cursor.execute(sql, (filename,))
+        result = self.cursor.fetchone()
+        if result:
+            return True
+        return False
 
     def get_portfolio_by_student_id(self, student_id):
         sql = """SELECT * FROM portfolio WHERE student_id = ?"""
