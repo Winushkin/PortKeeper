@@ -118,11 +118,22 @@ def classes():
         img_bytes = uploaded_file.read()
         db.insert_teachers_avatar(img_bytes, session["teacher_id"],)
     students = db.get_students_by_teacher_id(session["teacher_id"])
-    if db.get_students_by_teacher_id(session["teacher_id"])[5]:
+    if db.get_teacher_by_teacher_id(session["teacher_id"])[5]:
         avatar = True
     else:
         avatar = False
     return render_template("classes.html", students=students, title="Teacher profile", avatar=avatar)
+
+
+@app.route("/classes/settings")
+def settings():
+    students = db.get_students_by_teacher_id(session["teacher_id"])
+    return render_template("settings.html", students=students, title="settings")
+
+@app.route("/delete_student/<string:student_id>")
+def delete_student(student_id):
+    db.delete_student_by_id(student_id)
+    return redirect(url_for("settings"))
 
 
 @app.route("/profile/<student_id>", methods=["POST", "GET"])
@@ -250,9 +261,9 @@ def download_zip(student_id):
 @app.route("/document/<string:filename>")
 def show_document(filename):
     is_exist = db.check_portfolio(filename)
+    exp = filename.split(".")[1]
     if is_exist:
         h = make_response(open("./static/files/" + filename, "rb"))
-        exp = filename.split(".")[1]
         if exp == "pdf":
             h.headers['Content-Type'] = 'files/pdf'
         else:

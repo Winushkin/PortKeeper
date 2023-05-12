@@ -357,6 +357,14 @@ input::placeholder {
     background-color: #FFFFFF;
     width: 530px;
 }
+
+.students-settings {
+    background-color: #FFFFFF;
+    width: 1000px;
+    margin: 0 auto;
+}
+
+
 thead {
     display: flex;
 }
@@ -392,7 +400,32 @@ th:first-child, td:first-child {
 th:last-child, td:last-child {
     width: 30%;
 }
+.btn-red{
+    background-color: #800000;
+    border: #c5afb0;
+    border: solid;
+}
 
+
+.FIO{
+    min-width: 48%;
+}
+
+.CLASS{
+    min-width: 8%;
+}
+
+.LOGIN{
+    min-width: 13%;
+}
+
+.PASS{
+    min-width: 13%;
+}
+
+.CHANGE{
+    min-width: 8%;
+}
 
 
 

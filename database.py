@@ -136,6 +136,15 @@ class DataBase:
         self.cursor.execute(sql, (name, login, password, teacher_id, class_num, old))
         self.connection.commit()
 
+
+    def delete_student_by_id(self, student_id):
+        sql = """DELETE FROM students
+                 WHERE student_id = ?
+                 """
+        self.cursor.execute(sql, (student_id, ))
+        self.connection.commit()
+
+
     def update_students_novelty(self, student_id):
         sql = """UPDATE students
                  SET old = 1

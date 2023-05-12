@@ -1,9 +1,16 @@
-from flask import Blueprint, jsonify, request, url_for
+from flask import Blueprint, jsonify, request, url_for, send_from_directory, make_response
+
+from added_files.zipper import file_zipping, zip_delete
 from database import DataBase
 from added_files import login_generator, password_generator
 
 db = DataBase("database/base.sqlite3")
 db.create_tables()
+
+
+UPLOAD_FOLDER = './static/files'
+DOWNLOAD_FOLDER = './static/files'
+ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg']
 
 blueprint = Blueprint(
     'site_api',
@@ -122,14 +129,29 @@ def get_exams(student_id):
         exam.pop("created_at")
     json_obj = {
                 "exams": exams
-    }
+                }
 
     return jsonify(json_obj)
 
+@blueprint.route("/api/delete_student/<student_id>")
+def delete_student_api(student_id):
+    db.delete_student_by_id(student_id)
+    return jsonify({"operation": "OK"})
 
-@blueprint.route('/api/download_all/')
-def download_all():
-    pass
+
+@blueprint.route('/api/download_all/<student_id>')
+def download_all(student_id):
+    portfolio = db.get_portfolio_by_student_id(student_id)
+    archive = file_zipping(portfolio)
+    zip_sender = send_from_directory(DOWNLOAD_FOLDER, archive, as_attachment=True)
+
+    h = make_response(open("./static/files/" + archive, "rb"))
+    h.headers['Content_Type'] = 'files/zip'
+    json_obj = {
+                "request": url_for("show_document", )
+               }
+    zip_delete(archive)
+
 
 
 @blueprint.route('/api/download_one/')
