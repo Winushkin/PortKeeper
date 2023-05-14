@@ -29,6 +29,7 @@ class DataBase:
         """
         self.cursor.execute(sql)
 
+
         sql = """CREATE TABLE IF NOT EXISTS teachers ( 
             teacher_id           INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT,
             name                 TEXT NOT NULL  ,
@@ -37,9 +38,20 @@ class DataBase:
             post                 TEXT NOT NULL  ,
             avatar               BLOB           ,
             created_at           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP   
-        );
+                    );
         """
         self.cursor.execute(sql)
+
+
+        # sql = """CREATE TABLE IF NOT EXISTS groups (
+        #          groups_id         INTEGER NOT NULL  PRIMARY KEY AUTOINCREMENT,
+        #          name             TEXT NOT NULL                              ,
+        #          teacher_id       INTEGER NOT NULL                           ,
+        #          FOREIGN KEY( teacher_id ) REFERENCES teachers( teacher_id ) ON DELETE CASCADE ON UPDATE CASCADE
+        #         );
+        #         """
+        # self.cursor.execute(sql)
+
 
         sql = """CREATE TABLE IF NOT EXISTS portfolio  ( 
             portfolio_id         INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT   ,
@@ -56,6 +68,7 @@ class DataBase:
         );"""
         self.cursor.execute(sql)
 
+
         sql = """CREATE TABLE IF NOT EXISTS exams ( 
                     exam_id           INTEGER NOT NULL  PRIMARY KEY  AUTOINCREMENT,
                     subject           TEXT,
@@ -67,6 +80,8 @@ class DataBase:
                 );
                 """
         self.cursor.execute(sql)
+
+
         self.connection.commit()
 
 
@@ -158,6 +173,26 @@ class DataBase:
                  WHERE student_id = ?"""
         self.cursor.execute(sql, (avatar, student_id))
         self.connection.commit()
+
+
+# _______________________________________________________GROUPS_________________________________________________________
+
+    def get_teachers_groups(self, teacher_id):
+        sql = """SELECT * FROM groups
+                 WHERE teacher_id = ?
+                 """
+        self.cursor.execute(sql, (teacher_id, ))
+        self.connection.commit()
+
+
+    def insert_group(self, name, teacher_id):
+        sql = """INSERT INTO groups (name, teacher_id)
+                 VALUES (?, ?)
+              """
+        self.cursor.execute(sql, (name, teacher_id))
+        self.connection.commit()
+
+
 
 #_______________________________________________________PORTFOLIO_______________________________________________________
 
