@@ -3,9 +3,10 @@ import uuid
 import fitz
 
 from flask import Flask, render_template, redirect, session, request, send_from_directory, \
-    url_for, make_response, abort
+    url_for, make_response, abort, flash
 from forms.login_form import LoginForm
 from forms.StudentAdd_form import AddStudents
+from forms.registration_form import RegistrationForm
 
 from added_files.login_generator import generate_login
 from added_files.password_generator import generate_password
@@ -54,7 +55,6 @@ def info():
     return render_template("information.html", title="Information")
 
 @app.route("/")
-@app.route('/index')
 def index():
     if "teacher_id" in session:
         return redirect("classes")
@@ -199,19 +199,19 @@ def add_student():
     return render_template("add-students.html", title="new student", form=form)
 
 
-# @app.route("/registration", methods=["POST", "GET"])
-# def registration():
-#     form = RegistrationForm()
-#     if form.validate_on_submit():
-#         class_code = form.class_code.data
-#         login = form.login.data
-#         is_uniq_login = db.check_uniq_login(login)
-#         if not is_uniq_login:
-#             flash("Логин уже существует. Придумайте другой")
-#         else:
-#             pass
-#
-#     return render_template("student_registration.html", title="registration", form=form)
+@app.route("/registration", methods=["POST", "GET"])
+def registration():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        class_code = form.class_code.data
+        login = form.login.data
+        is_uniq_login = db.check_uniq_login(login)
+        if not is_uniq_login:
+            flash("Логин уже существует. Придумайте другой")
+        else:
+            pass
+
+    return render_template("teacher-registration.html", title="registration", form=form)
 
 # ___________________________________________________FILES_______________________________________________________________
 
@@ -271,6 +271,10 @@ def show_document(filename):
         return h
     abort(404)
 
+
+@app.route("/show_api_document/<h>")
+def show_api_document(h):
+    return h
 
 @app.route("/user_avatar")
 def user_avatar():

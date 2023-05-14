@@ -51,11 +51,11 @@ def classes_api(teacher_id):
                         "class": students[index][7]
                         }
 
-    json_obj = {
+    dict_obj = {
             "teacher": teacher,
             "students": students
     }
-    return jsonify(json_obj)
+    return jsonify(dict_obj)
 
 
 @blueprint.route('/api/profile/<string:student_id>')
@@ -66,8 +66,7 @@ def profile_api(student_id):
     port_reqs = [list(item)[5] for item in portfolio]
 
     json_obj = {
-            "student":
-                     {
+            "student":{
                     "student_id": student[0],
                     "name": student[1],
                     "login": student[2],
@@ -101,7 +100,7 @@ def add_student_api():
         password = password_generator.generate_password()
 
         db.insert_student(student_name, login, password, teacher_id, student_class, 0)
-
+    return jsonify({"operation": "OK"})
 
 @blueprint.route('/api/add_portfolio')
 def add_portfolio_api():
@@ -119,6 +118,7 @@ def add_portfolio_api():
         result = request.json["result"]
         random_uuid = request.json["random_uuid"]
         db.insert_portfolio(name, subject, student_id, level, random_uuid, result, date)
+        return jsonify({"operation": "OK"})
 
 
 @blueprint.route('/api/get_exams/<student_id>')
@@ -148,10 +148,10 @@ def download_all(student_id):
     h = make_response(open("./static/files/" + archive, "rb"))
     h.headers['Content_Type'] = 'files/zip'
     json_obj = {
-                "request": url_for("show_document", )
+                "request": url_for("show_api_document", h=h)
                }
     zip_delete(archive)
-
+    return jsonify(json_obj)
 
 
 @blueprint.route('/api/download_one/')
