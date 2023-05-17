@@ -245,11 +245,16 @@ class DataBase:
 
 #________________________________________________________GENERAL________________________________________________________
 
-    def check_uniq_login(self, login):
-        sql = """SELECT * FROM students
-                 WHERE login = ?"""
-        self.cursor.execute(sql, (login, ))
-        self.connection.commit()
+    def get_logins(self, post):
+        if post == "teachers":
+            sql = """SELECT login FROM teachers"""
+        else:
+            sql = """SELECT login FROM students"""
+
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
+
+
 
 
 

@@ -47,7 +47,7 @@ exams_subjects = ["Русский язык", "Литература", "Алгеб
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect("index")
+    return redirect(url_for("index"))
 
 
 @app.route("/info")
@@ -199,8 +199,8 @@ def add_student():
     return render_template("add-students.html", title="new student", form=form)
 
 
-@app.route("/registration", methods=["POST", "GET"])
-def registration():
+@app.route("/student_registration", methods=["POST", "GET"])
+def student_registration():
     form = RegistrationForm()
     if form.validate_on_submit():
         class_code = form.class_code.data
@@ -210,6 +210,18 @@ def registration():
             flash("Логин уже существует. Придумайте другой")
         else:
             pass
+
+    return render_template("student_registration.html", title="registration", form=form)
+
+@app.route("/teacher_registration", methods=["POST", "GET"])
+def teacher_registration():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        class_code = form.class_code.data
+        login = form.login.data
+        is_uniq_login = db.check_uniq_login(login)
+        if not is_uniq_login:
+            flash("Логин уже существует. Придумайте другой")
 
     return render_template("teacher-registration.html", title="registration", form=form)
 

@@ -14,15 +14,9 @@
             {% for error in form.login.errors %}
                 <div class="error">{{ error }}</div>
             {% endfor %}
-            {% with messages = get_flashed_messages() %}
-              {% if messages %}
-                <ul class="flashes">
-                {% for message in messages %}
-                  <li>{{ message }}</li>
-                {% endfor %}
-                </ul>
-              {% endif %}
-            {% endwith %}
+            {% for msg in get_flashed_messages() %}
+                <div class="flash">{{msg}}</div>
+            {% endfor %}
 
             {{form.password()}}
             {% for error in form.password.errors %}

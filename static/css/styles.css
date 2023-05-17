@@ -97,6 +97,7 @@ header {
 .main-buttons {
     display: flex;
     justify-content: center;
+    wrap-option: 2;
 }
 
 
