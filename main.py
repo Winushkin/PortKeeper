@@ -14,6 +14,7 @@ from added_files.zipper import file_zipping, zip_delete
 
 from data import db_session
 from database import DataBase
+from data.students import Student
 import site_api
 
 
@@ -33,6 +34,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = DataBase("database/base.sqlite3")
 db.create_tables()
+
 
 
 exams_subjects = ["Русский язык", "Литература", "Алгебра", "Геометрия", "Информатика", "Музыка",
@@ -188,11 +190,14 @@ def add_student():
     form = AddStudents()
     if "teacher_id" in session:
         if form.validate_on_submit():
-            name = form.student_name.data
-            login = generate_login(name)
-            class_num = form.class_number.data
-            password = generate_password()
-            db.insert_student(name, login, password, session["teacher_id"], class_num, 0)
+            student = Student()
+            student.name = form.student_name.data
+            student.login = generate_login(student.name)
+            student.password = generate_password()
+            student.teacher_id = session["teacher_id"]
+            student.group = form.class_number.data
+            db_sess.add(student)
+            db_sess.commit()
             return redirect("classes")
     else:
         return redirect("index")
@@ -330,5 +335,6 @@ def teacher_avatar(teacher_id):
 
 if __name__ == "__main__":
     app.register_blueprint(site_api.blueprint)
-#    db_session.global_init("db/database.db")
+    db_session.global_init("db/database.db")
+    db_sess = db_session.create_session()
     app.run(debug=True)
