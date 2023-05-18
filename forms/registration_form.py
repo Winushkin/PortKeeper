@@ -6,7 +6,7 @@ from database import DataBase
 db = DataBase("database/base.sqlite3")
 db.create_tables()
 
-login_list = [x for x in db.get_logins("students")]
+login_list = [x for x in db.get_logins("students") + db.get_logins("teachers")]
 
 class RegistrationForm(FlaskForm):
     class_code = StringField("Код вашего класса", validators=[DataRequired()])

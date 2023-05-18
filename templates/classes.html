@@ -37,10 +37,10 @@
                         </div>
                     </form>
                 <div>
-                    <p class="login-p">{{session["name"]}}<p>
+                    <p class="login-p">{{teacher.name}}<p>
                 </div>
                 <div>
-                    <p class="login-p">{{session["post"]}}<p>
+                    <p class="login-p">{{teacher.post}}<p>
                 </div>
             </div>
 
@@ -57,9 +57,9 @@
                     <tbody class="students-list">
                         {% for student in students %}
                         <tr>
-                            <td><a class="student-link" href="/profile/{{student[0]}}">{{student[1]}}</a></td>
-                            <td>{{student[7]}}</td>
-                            <td>{{student[3]}}</td>
+                            <td><a class="student-link" href="/profile/{{student.id}}">{{student.name}}</a></td>
+                            <td>{{student.group}}</td>
+                            <td>{{student.password}}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

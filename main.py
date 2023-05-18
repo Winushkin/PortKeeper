@@ -15,6 +15,9 @@ from added_files.zipper import file_zipping, zip_delete
 from data import db_session
 from database import DataBase
 from data.students import Student
+from data.teachers import Teacher
+from data.portfolio import Portfolio
+from data.exams import Exam
 import site_api
 
 
@@ -80,13 +83,10 @@ def teacher_login():
     if form.validate_on_submit():
         login = form.login.data
         password = form.password.data
-        teacher = db.get_teacher(login, password)
+        teacher = db_sess.query(Teacher).filter(Teacher.login == login, Teacher.password == password).first()
         if teacher:
-            session["teacher_id"] = teacher[0]
-            session["name"] = teacher[1]
-            session["login"] = teacher[2]
-            session["post"] = teacher[4]
-            return redirect("classes")
+            session["teacher_id"] = teacher.id
+            return redirect(url_for("classes"))
     return render_template("teacher-login.html", form=form, title="Teacher Login")
 
 
@@ -119,41 +119,46 @@ def classes():
         uploaded_file = request.files['file']
         img_bytes = uploaded_file.read()
         db.insert_teachers_avatar(img_bytes, session["teacher_id"],)
-    students = db.get_students_by_teacher_id(session["teacher_id"])
-    if db.get_teacher_by_teacher_id(session["teacher_id"])[5]:
-        avatar = True
-    else:
-        avatar = False
-    return render_template("classes.html", students=students, title="Teacher profile", avatar=avatar)
+    teacher = db_sess.query(Teacher).filter(Teacher.id == session["teacher_id"]).first()
+    students = db_sess.query(Student).filter(Student.teacher_id == teacher.id)
+
+    return render_template("classes.html", students=students, title="Teacher profile", teacher=teacher)
 
 
 @app.route("/classes/settings")
 def settings():
-    students = db.get_students_by_teacher_id(session["teacher_id"])
-    return render_template("settings.html", students=students, title="settings")
+    students = db_sess.query(Student).filter(Student.teacher_id == session["teacher_id"])
+    return render_template("settings.html", students=students, title="settings", )
+
 
 @app.route("/delete_student/<string:student_id>")
 def delete_student(student_id):
-    db.delete_student_by_id(student_id)
+    db_sess.query(Student).filter(Student.id == student_id).delete()
+    db_sess.commit()
     return redirect(url_for("settings"))
 
 
 @app.route("/profile/<student_id>", methods=["POST", "GET"])
 def profile_by_id(student_id):
-    student = db.get_student_by_student_id(student_id)
-    portfolio = db.get_portfolio_by_student_id(student_id)
-    exams = db.get_exams_by_student_id(student_id)
+    student = db_sess.query(Student).filter(Student.id == student_id).first()
+    portfolio = db_sess.query(Portfolio).filter(Portfolio.student_id == student_id).all()
+    exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
     if request.method == "POST":
-        db.update_students_novelty(student_id)
-        db.delete_exams(student_id)
+        db_sess.query(Exam).filter(Exam.student_id == student_id).delete()
+        db_sess.commit()
         for i in range(1, 5):
             subject = request.form.get("exam" + str(i))
             mark = request.form.get("mark" + str(i))
-            db.insert_exams(subject, mark, student_id)
-        exams = db.get_exams_by_student_id(student_id)
-        student = db.get_student_by_student_id(student_id)
+            exam = Exam()
+            exam.subject = subject
+            exam.mark = mark
+            exam.student_id = student_id
+            db_sess.add(exam)
+        db_sess.commit()
+        exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
+        student = db_sess.query(Student).filter(Student.id == student_id).first()
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
-                                                exams=exams, subjects=exams_subjects, old = student[-1], N=None)
+                                                exams=exams, subjects=exams_subjects)
 
 
 @app.route("/profile", methods=["POST", "GET"])

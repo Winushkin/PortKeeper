@@ -18,8 +18,8 @@
             {% endif %}
 
 
-          <p class="port-text">{{ student[1] }}</p>
-          <p class="port-text">Класс: {{ student[7] }}</p>
+          <p class="port-text">{{ student.name }}</p>
+          <p class="port-text">Класс: {{ student.group }}</p>
           <form action="" enctype="multipart/form-data" method="post">
                     <div class="upload-avatar__wrapper">
                         <input type="file"
@@ -53,14 +53,14 @@
               {% if "teacher_id" in session %}
                 {% for i in range(1, 5) %}
                   <tr>
-                    {% if old %}
+                    {% if exams %}
                       <td>
                         <select name="exam{{i}}">
-                          {% for subject in range(19) %}
-                            {% if subjects[subject] == exams[i-1][1] %}
-                              <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
+                          {% for index in range(19) %}
+                            {% if subjects[index] == exams[i-1].subject %}
+                              <option value={{subjects[index]}} selected> {{subjects[index]}}</option>
                             {% else %}
-                              <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
+                              <option value={{subjects[index]}}> {{subjects[index]}}</option>
                             {% endif %}
                           {% endfor %}
                         </select>
@@ -68,9 +68,9 @@
                       <td>
                         <select name="mark{{i}}">
                           {% for mark in range(1, 6) %}
-                            {% if mark == exams[i-1][2] %}
+                            {% if mark == exams[i-1].mark %}
                               <option value={{mark}} selected>{{mark}}</option>
-                            {% elif mark == None %}
+                            {% elif exams[i - 1].mark == None %}
                               <option value="" selected disabled></option>
                             {% else %}
                               <option value={{mark}}>{{mark}}</option>
@@ -104,17 +104,17 @@
                 {% endfor %}
 
               {% elif "student_id" in session %}
-                {% if old %}
+                {% if exams %}
                   {% for exam in exams %}
                     <tr>
                       <td>
-                        <p>{{ exam[1] }}</p>
+                        <p>{{ exam.subject }}</p>
                       </td>
                       <td>
-                        {% if not exam[2] %}
+                        {% if not exam.mark %}
                           <p></p>
                         {% else %}
-                          <p>{{ exam[2] }}</p>
+                          <p>{{ exam.mark }}</p>
                         {% endif %}
                       </td>
                     </tr>
@@ -124,11 +124,11 @@
                     <tr>
                       <td>
                         <select name="exam{{i}}">
-                          {% for subject in range(19) %}
-                            {% if subject == i - 1 %}
-                              <option value={{subjects[subject]}} selected> {{subjects[subject]}}</option>
+                          {% for index in range(19) %}
+                            {% if index == i - 1 %}
+                              <option value={{subjects[index]}} selected> {{subjects[index]}}</option>
                             {% else %}
-                              <option value={{subjects[subject]}}> {{subjects[subject]}}</option>
+                              <option value={{subjects[index]}}> {{subjects[index]}}</option>
                             {% endif %}
                           {% endfor %}
                         </select>
@@ -166,11 +166,11 @@
             <tbody>
               {% for item in port %}
                 <tr>
-                  <td class="td-2">{{item[6]}}</td>
-                  <td class="td-2">{{item[2]}}</td>
-                  <td class="td-2">{{item[1]}}</td>
-                  <td class="td-2">{{item[-1]}}</td>
-                  <td class="td-2">{{item[-2]}}</td>
+                  <td class="td-2">{{item.level}}</td>
+                  <td class="td-2">{{item.subject}}</td>
+                  <td class="td-2">{{item.name}}</td>
+                  <td class="td-2">{{item.date}}</td>
+                  <td class="td-2">{{item.result}}</td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -181,18 +181,18 @@
           <a href="/add-portfolio" type="submit" class="button-center button-add"><strong>Добавить достижение</strong></a>
         {% endif %}
         <p class="header-page"><strong>Достижения:</strong></p>
-        <a href='/profile/download-all/{{student[0]}}' class="portfolio-link">Скачать Всё</a>
+        <a href='/profile/download-all/{{student.id}}' class="portfolio-link">Скачать Всё</a>
 
         <div class="portfolio-files">
           {% for item in port %}
             <div class="portfolio-item">
-              {% if item[5].split(".")[-1] == "pdf" %}
-                {% set file = item[5][:-4] + "-miniature.jpg" %}
+              {% if item.file_uuid.split(".")[-1] == "pdf" %}
+                {% set file = item.file_uuid[:-4] + "-miniature.jpg" %}
                 <img src={{url_for('static', filename='files/' + file)}} alt="" class="portfolio-image">
               {% else %}
-                <img src={{url_for('static', filename='files/' + item[5])}} alt="" class="portfolio-image">
+                <img src={{url_for('static', filename='files/' + item.file_uuid)}} alt="" class="portfolio-image">
               {% endif %}
-              <p class="portfolio-title">{{item[1]}}</p>
+              <p class="portfolio-title">{{item.name}}</p>
               <a href='/download/{{ item[5] }}' class="portfolio-link">Cкачать</a>
             </div>
           {% endfor %}
