@@ -16,11 +16,11 @@
         <tbody class="students-list">
           {% for student in students %}
             <tr>
-              <td class="FIO"><a class="student-link" href="/profile/{{student[0]}}">{{student[1]}}</a></td>
-              <td class="CLASS">{{student[7]}}</td>
-              <td class="LOGIN">{{student[2]}}</td>
-              <td class="PASS">{{student[3]}}</td>
-              <th class="CHANGE btn-red"><a href="/delete_student/{{student[0]}}"><strong>удалить</strong></a></th>
+              <td class="FIO"><a class="student-link" href="/profile/{{student.id}}">{{student.name}}</a></td>
+              <td class="CLASS">{{student.group}}</td>
+              <td class="LOGIN">{{student.login}}</td>
+              <td class="PASS">{{student.password}}</td>
+              <th class="CHANGE btn-red"><a href="/delete_student/{{student.id}}"><strong>удалить</strong></a></th>
             </tr>
           {% endfor %}
         </tbody>

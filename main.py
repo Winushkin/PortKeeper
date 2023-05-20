@@ -1,5 +1,6 @@
 import os
 import uuid
+
 import fitz
 
 from flask import Flask, render_template, redirect, session, request, send_from_directory, \
@@ -14,8 +15,11 @@ from added_files.zipper import file_zipping, zip_delete
 
 from data import db_session
 from database import DataBase
-import site_api
-
+from data.students import Student
+from data.teachers import Teacher
+from data.portfolio import Portfolio
+from data.exams import Exam
+from blueprints import site_api
 
 UPLOAD_FOLDER = './static/files'
 DOWNLOAD_FOLDER = './static/files'
@@ -33,6 +37,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = DataBase("database/base.sqlite3")
 db.create_tables()
+
 
 
 exams_subjects = ["Русский язык", "Литература", "Алгебра", "Геометрия", "Информатика", "Музыка",
@@ -76,15 +81,14 @@ def teacher_login():
         return redirect("classes")
     form = LoginForm()
     if form.validate_on_submit():
+        db_sess = db_session.create_session()
         login = form.login.data
         password = form.password.data
-        teacher = db.get_teacher(login, password)
+        teacher = db_sess.query(Teacher).filter(Teacher.login == login, Teacher.password == password).first()
         if teacher:
-            session["teacher_id"] = teacher[0]
-            session["name"] = teacher[1]
-            session["login"] = teacher[2]
-            session["post"] = teacher[4]
-            return redirect("classes")
+            session["teacher_id"] = teacher.id
+            session["name"] = teacher.name
+            return redirect(url_for("classes"))
     return render_template("teacher-login.html", form=form, title="Teacher Login")
 
 
@@ -96,15 +100,16 @@ def student_login():
     if "student_id" in session:
         return redirect("profile")
     if form.validate_on_submit():
+        db_sess = db_session.create_session()
         login = form.login.data
         password = form.password.data
-        student = db.get_student(login, password)
+        student = db_sess.query(Student).filter(Student.login == login, Student.password == password).first()
         if student:
-            session["student_id"] = student[0]
-            session["name"] = student[1]
-            session["login"] = student[2]
-            session["birth-date"] = student[5]
-            session["class"] = student[7]
+            session["student_id"] = student.id
+            session["name"] = student.name
+            session["login"] = student.login
+            session["birth-date"] = student.birth_date
+            session["class"] = student.group
             return redirect(url_for("profile"))
     return render_template("student-login.html", form=form, title="Student Login")
 
@@ -113,86 +118,104 @@ def student_login():
 def classes():
     if "teacher_id" not in session or "student_id" in session:
         return redirect("index")
+    db_sess = db_session.create_session()
     if request.method == "POST":
         uploaded_file = request.files['file']
         img_bytes = uploaded_file.read()
-        db.insert_teachers_avatar(img_bytes, session["teacher_id"],)
-    students = db.get_students_by_teacher_id(session["teacher_id"])
-    if db.get_teacher_by_teacher_id(session["teacher_id"])[5]:
-        avatar = True
-    else:
-        avatar = False
-    return render_template("classes.html", students=students, title="Teacher profile", avatar=avatar)
+        teacher = db_sess.query(Teacher).filter(Teacher.id == session["teacher_id"]).first()
+        teacher.avatar = img_bytes
+        db_sess.commit()
+    teacher = db_sess.query(Teacher).filter(Teacher.id == session["teacher_id"]).first()
+    students = db_sess.query(Student).filter(Student.teacher_id == teacher.id).all()
+
+    return render_template("classes.html", students=students, title="Teacher profile", teacher=teacher)
 
 
 @app.route("/classes/settings")
 def settings():
-    students = db.get_students_by_teacher_id(session["teacher_id"])
-    return render_template("settings.html", students=students, title="settings")
+    db_sess = db_session.create_session()
+    students = db_sess.query(Student).filter(Student.teacher_id == session["teacher_id"])
+    return render_template("settings.html", students=students, title="settings", )
+
 
 @app.route("/delete_student/<string:student_id>")
 def delete_student(student_id):
-    db.delete_student_by_id(student_id)
+    db_sess = db_session.create_session()
+    db_sess.query(Student).filter(Student.id == student_id).delete()
+    db_sess.commit()
     return redirect(url_for("settings"))
 
 
 @app.route("/profile/<student_id>", methods=["POST", "GET"])
 def profile_by_id(student_id):
-    student = db.get_student_by_student_id(student_id)
-    portfolio = db.get_portfolio_by_student_id(student_id)
-    exams = db.get_exams_by_student_id(student_id)
+    db_sess = db_session.create_session()
+    #student = db_sess.query(Student).filter(Student.id == student_id).first()
+    portfolio = db_sess.query(Portfolio).filter(Portfolio.student_id == student_id).all()
+    #exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
     if request.method == "POST":
-        db.update_students_novelty(student_id)
-        db.delete_exams(student_id)
+        db_sess.query(Exam).filter(Exam.student_id == student_id).delete()
         for i in range(1, 5):
             subject = request.form.get("exam" + str(i))
             mark = request.form.get("mark" + str(i))
-            db.insert_exams(subject, mark, student_id)
-        exams = db.get_exams_by_student_id(student_id)
-        student = db.get_student_by_student_id(student_id)
+            exam = Exam()
+            print(subject)
+            exam.subject = subject
+            exam.mark = mark
+            exam.student_id = student_id
+            db_sess.add(exam)
+        db_sess.commit()
+    exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
+    student = db_sess.query(Student).filter(Student.id == student_id).first()
+    print(exams_subjects)
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
-                                                exams=exams, subjects=exams_subjects, old = student[-1], N=None)
+                                                exams=exams, subjects=exams_subjects)
 
 
 @app.route("/profile", methods=["POST", "GET"])
 def profile():
+    db_sess = db_session.create_session()
     student_id = session["student_id"]
-    student = db.get_student_by_student_id(student_id)
-    portfolio = db.get_portfolio_by_student_id(student_id)
-    exams = db.get_exams_by_student_id(student_id)
+    student = db_sess.query(Student).filter(Student.id == student_id).first()
+    portfolio = db_sess.query(Portfolio).filter(Portfolio.student_id == student_id).all()
+    exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
     if request.method == "POST":
         if "exam1" in request.form.keys():
-            db.update_students_novelty(student_id)
-            db.delete_exams(student_id)
+            db_sess.query(Exam).filter(Exam.student_id == student_id).delete()
+            db_sess.commit()
             for i in range(1, 5):
                 subject = request.form.get("exam" + str(i))
                 mark = request.form.get("mark" + str(i))
-                db.insert_exams(subject, mark, student_id)
-            exams = db.get_exams_by_student_id(student_id)
-            student = db.get_student_by_student_id(student_id)
+                exam = Exam()
+                exam.subject = subject
+                exam.mark = mark
+                exam.student_id = student_id
+                db_sess.add(exam)
+            db_sess.commit()
         else:
             uploaded_file = request.files['file']
             img_bytes = uploaded_file.read()
-            db.insert_student_avatar(img_bytes, session["student_id"])
-
-    if db.get_student_by_student_id(session["student_id"])[4]:
-        avatar = True
-    else:
-        avatar = False
-
+            student = db_sess.query(Student).filter(Student.id == session["student_id"]).first()
+            student.avatar = img_bytes
+            db_sess.commit()
+        student = db_sess.query(Student).filter(Student.id == session["student_id"]).first()
+        exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
-                                                exams=exams, subjects=exams_subjects, old=student[-1], N=None, avatar=avatar)
+                                                exams=exams, subjects=exams_subjects)
 
 @app.route("/add-student", methods=["POST", "GET"])
 def add_student():
     form = AddStudents()
     if "teacher_id" in session:
         if form.validate_on_submit():
-            name = form.student_name.data
-            login = generate_login(name)
-            class_num = form.class_number.data
-            password = generate_password()
-            db.insert_student(name, login, password, session["teacher_id"], class_num, 0)
+            db_sess = db_session.create_session()
+            student = Student()
+            student.name = form.student_name.data
+            student.login = generate_login(student.name)
+            student.password = generate_password()
+            student.teacher_id = session["teacher_id"]
+            student.group = form.class_number.data
+            db_sess.add(student)
+            db_sess.commit()
             return redirect("classes")
     else:
         return redirect("index")
@@ -210,7 +233,6 @@ def student_registration():
             flash("Логин уже существует. Придумайте другой")
         else:
             pass
-
     return render_template("student_registration.html", title="registration", form=form)
 
 @app.route("/teacher_registration", methods=["POST", "GET"])
@@ -230,6 +252,7 @@ def teacher_registration():
 @app.route("/add-portfolio", methods=["POST", "GET"])
 def add_port():
     if request.method == "POST":
+        db_sess = db_session.create_session()
         name = request.form.get("name")
         level = request.form.get("level")
         subject = request.form.get("subject")
@@ -247,7 +270,15 @@ def add_port():
                     pdf_image = page.get_pixmap(matrix=fitz.Identity, dpi=None,
                                                 colorspace=fitz.csRGB, clip=None, alpha=False, annots=True)
                 pdf_image.save(os.path.join(UPLOAD_FOLDER, random_uuid.split(".")[0] + "-miniature.jpg"))
-        db.insert_portfolio(name, subject, int(session["student_id"]), level, random_uuid, result, date)
+        port = Portfolio()
+        port.name = name
+        port.subject = subject
+        port.student_id = int(session["student_id"])
+        port.level = level
+        port.file_uuid = random_uuid
+        port.result = result
+        port.date = date
+        db_sess.add(port)
         return redirect(url_for("profile"))
 
     return render_template("port-add-item.html", title="Add portfolio")
@@ -263,7 +294,8 @@ def download_file(file_uuid):
 @app.route("/profile/download-all/<string:student_id>")
 def download_zip(student_id):
     if "teacher_id" in session or "student_id" in session:
-        portfolio = db.get_portfolio_by_student_id(student_id)
+        db_sess = db_session.create_session()
+        portfolio = db_sess.query(Portfolio).filter(Portfolio.student_id == student_id).all()
         archive = file_zipping(portfolio)
         zip_sender = send_from_directory(DOWNLOAD_FOLDER, archive, as_attachment=True)
         zip_delete(archive)
@@ -272,7 +304,8 @@ def download_zip(student_id):
 
 @app.route("/document/<string:filename>")
 def show_document(filename):
-    is_exist = db.check_portfolio(filename)
+    db_sess = db_session.create_session()
+    is_exist = db_sess.query(Portfolio).filter(Portfolio.file_uuid == filename)
     exp = filename.split(".")[1]
     if is_exist:
         h = make_response(open("./static/files/" + filename, "rb"))
@@ -290,12 +323,13 @@ def show_api_document(h):
 
 @app.route("/user_avatar")
 def user_avatar():
+    db_sess = db_session.create_session()
     if "teacher_id" in session:
-        current_user = db.get_teacher_by_teacher_id(session["teacher_id"])
-        img = current_user[5]
+        current_user = db_sess.query(Teacher).filter(Teacher.id == session["teacher_id"]).first()
+        img = current_user.avatar
     if "student_id" in session:
-        current_user = db.get_student_by_student_id(session["student_id"])
-        img = current_user[4]
+        current_user = db_sess.query(Student).filter(Student.id == session["student_id"]).first()
+        img = current_user.avatar
     if not img:
         return ""
     h = make_response(img)
@@ -305,8 +339,9 @@ def user_avatar():
 
 @app.route("/student_avatar/<string:student_id>")
 def student_avatar(student_id):
-    current_user = db.get_student_by_student_id(student_id)
-    img = current_user[4]
+    db_sess = db_session.create_session()
+    current_user = current_user = db_sess.query(Student).filter(Student.id == student_id).first()
+    img = current_user.avatar
     if not img:
         return ""
     h = make_response(img)
@@ -316,8 +351,9 @@ def student_avatar(student_id):
 
 @app.route("/teacher_avatar/<string:teacher_id>")
 def teacher_avatar(teacher_id):
-    current_user = db.get_teacher_by_teacher_id(teacher_id)
-    img = current_user[5]
+    db_sess = db_session.create_session()
+    current_user = db_sess.query(Teacher).filter(Teacher.id == session["teacher_id"]).first()
+    img = current_user.avatar
     if not img:
         return ""
     h = make_response(img)
@@ -329,6 +365,6 @@ def teacher_avatar(teacher_id):
 
 
 if __name__ == "__main__":
-    app.register_blueprint(site_api.blueprint)
-#    db_session.global_init("db/database.db")
+    # app.register_blueprint(site_api.blueprint)
+    db_session.global_init("db/database.db")
     app.run(debug=True)

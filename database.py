@@ -22,7 +22,6 @@ class DataBase:
             created_at           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP  ,
             class                TEXT NOT NULL                                ,
             teacher_id           INTEGER NOT NULL                             ,
-            event_time           TEXT NOT NULL                                ,
             old                  INTEGER NOT NULL                             ,
             FOREIGN KEY ( teacher_id ) REFERENCES teachers( teacher_id ) ON DELETE CASCADE ON UPDATE CASCADE
         );
