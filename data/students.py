@@ -2,8 +2,10 @@ import sqlalchemy
 import datetime
 from .db_session import SqlAlchemyBase
 from sqlalchemy import orm
+from sqlalchemy_serializer import SerializerMixin
 
-class Student(SqlAlchemyBase):
+
+class Student(SqlAlchemyBase, SerializerMixin):
     __tablename__ = "students"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)

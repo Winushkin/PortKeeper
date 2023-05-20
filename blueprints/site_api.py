@@ -1,11 +1,16 @@
 from flask import Blueprint, jsonify, request, url_for, send_from_directory, make_response
+import os
 
 from added_files.zipper import file_zipping, zip_delete
 from database import DataBase
 from added_files import login_generator, password_generator
 
-db = DataBase("database/base.sqlite3")
-db.create_tables()
+from ..data import db_session
+from ..data.teachers import Teacher
+from ..data.exams import Exam
+from ..data.groups import Group
+from ..data.portfolio import Portfolio
+from ..data.students import Student
 
 
 UPLOAD_FOLDER = './static/files'
@@ -20,10 +25,12 @@ blueprint = Blueprint(
 
 
 
+
 @blueprint.route('/api/get_student/<login>/<password>')
 def get_student_api(login, password):
-    student = dict(db.get_student(login, password))
-    student["avatar"] = url_for("student_avatar", student_id=student["student_id"])
+    db_sess = db_session.create_session()
+    student = db_sess.query(Student).filter(Student.login == login, Student.password == password)
+    student.avatar = url_for("student_avatar", student_id=student["student_id"])
     return jsonify(student)
 
 

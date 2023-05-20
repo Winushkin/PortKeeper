@@ -1,6 +1,6 @@
 Flask~=2.3.2
 fitz~=0.0.1.dev2
 requests==2.30.0
-SQLAlchemy~=2.0.13
+SQLAlchemy==2.0.15
 WTForms~=3.0.1
 Flask-WTF~=1.1.1
