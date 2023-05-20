@@ -118,8 +118,8 @@ def student_login():
 def classes():
     if "teacher_id" not in session or "student_id" in session:
         return redirect("index")
+    db_sess = db_session.create_session()
     if request.method == "POST":
-        db_sess = db_session.create_session()
         uploaded_file = request.files['file']
         img_bytes = uploaded_file.read()
         teacher = db_sess.query(Teacher).filter(Teacher.id == session["teacher_id"]).first()
@@ -149,23 +149,24 @@ def delete_student(student_id):
 @app.route("/profile/<student_id>", methods=["POST", "GET"])
 def profile_by_id(student_id):
     db_sess = db_session.create_session()
-    student = db_sess.query(Student).filter(Student.id == student_id).first()
+    #student = db_sess.query(Student).filter(Student.id == student_id).first()
     portfolio = db_sess.query(Portfolio).filter(Portfolio.student_id == student_id).all()
-    exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
+    #exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
     if request.method == "POST":
         db_sess.query(Exam).filter(Exam.student_id == student_id).delete()
-        db_sess.commit()
         for i in range(1, 5):
             subject = request.form.get("exam" + str(i))
             mark = request.form.get("mark" + str(i))
             exam = Exam()
+            print(subject)
             exam.subject = subject
             exam.mark = mark
             exam.student_id = student_id
             db_sess.add(exam)
         db_sess.commit()
-        exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
-        student = db_sess.query(Student).filter(Student.id == student_id).first()
+    exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
+    student = db_sess.query(Student).filter(Student.id == student_id).first()
+    print(exams_subjects)
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
                                                 exams=exams, subjects=exams_subjects)
 
@@ -364,6 +365,6 @@ def teacher_avatar(teacher_id):
 
 
 if __name__ == "__main__":
-    app.register_blueprint(site_api.blueprint)
+    # app.register_blueprint(site_api.blueprint)
     db_session.global_init("db/database.db")
     app.run(debug=True)
