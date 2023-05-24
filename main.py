@@ -158,7 +158,6 @@ def profile_by_id(student_id):
             subject = request.form.get("exam" + str(i))
             mark = request.form.get("mark" + str(i))
             exam = Exam()
-            print(subject)
             exam.subject = subject
             exam.mark = mark
             exam.student_id = student_id
@@ -166,7 +165,6 @@ def profile_by_id(student_id):
         db_sess.commit()
     exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
     student = db_sess.query(Student).filter(Student.id == student_id).first()
-    print(exams_subjects)
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
                                                 exams=exams, subjects=exams_subjects)
 
@@ -279,6 +277,7 @@ def add_port():
         port.result = result
         port.date = date
         db_sess.add(port)
+        db_sess.commit()
         return redirect(url_for("profile"))
 
     return render_template("port-add-item.html", title="Add portfolio")
@@ -365,6 +364,6 @@ def teacher_avatar(teacher_id):
 
 
 if __name__ == "__main__":
-    # app.register_blueprint(site_api.blueprint)
+    app.register_blueprint(site_api.blueprint)
     db_session.global_init("db/database.db")
     app.run(debug=True)
