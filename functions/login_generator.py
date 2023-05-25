@@ -1,4 +1,4 @@
-from added_files.translator import translator
+from functions.translator import translator
 from random import randint
 
 

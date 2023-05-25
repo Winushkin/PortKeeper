@@ -5,7 +5,7 @@ import os
 
 
 def file_zipping(port_list):
-    files = [portfolio[5] for portfolio in port_list]
+    files = [portfolio.file_uuid for portfolio in port_list]
     archive_name = str(uuid.uuid4()) + ".zip"
     with ZipFile("static/files/" + archive_name, "w") as zf:
          for file in files:
