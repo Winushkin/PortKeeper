@@ -9,16 +9,17 @@ from forms.login_form import LoginForm
 from forms.StudentAdd_form import AddStudents
 from forms.registration_form import RegistrationForm
 
-from added_files.login_generator import generate_login
-from added_files.password_generator import generate_password
-from added_files.zipper import file_zipping, zip_delete
+from functions.login_generator import generate_login
+from functions.password_generator import generate_password
+from functions.zipper import file_zipping, zip_delete
 
 from data import db_session
-from database import DataBase
 from data.students import Student
 from data.teachers import Teacher
 from data.portfolio import Portfolio
 from data.exams import Exam
+from data.groups import Group
+from data.groups_to_students import GroupToStudent
 from blueprints import site_api
 
 UPLOAD_FOLDER = './static/files'
@@ -34,9 +35,6 @@ def allowed_file(filename):
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "hello hachapuri"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-db = DataBase("database/base.sqlite3")
-db.create_tables()
 
 
 
@@ -77,6 +75,14 @@ def support():
 
 @app.route("/teacher-login", methods=["GET", "POST"])
 def teacher_login():
+    db_sess = db_session.create_session()
+    # teacher = Teacher()
+    # teacher.name = "Беляев Кирилл Валерьевич"
+    # teacher.login = "BelyaevK1"
+    # teacher.password = 123
+    # teacher.post = "post"
+    # db_sess.add(teacher)
+    # db_sess.commit()
     if "teacher_id" in session:
         return redirect("classes")
     form = LoginForm()
@@ -126,6 +132,7 @@ def classes():
         teacher.avatar = img_bytes
         db_sess.commit()
     teacher = db_sess.query(Teacher).filter(Teacher.id == session["teacher_id"]).first()
+    groups = db_sess.query(Group).filter
     students = db_sess.query(Student).filter(Student.teacher_id == teacher.id).all()
 
     return render_template("classes.html", students=students, title="Teacher profile", teacher=teacher)

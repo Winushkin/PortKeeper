@@ -1,15 +1,11 @@
 from flask import Blueprint, jsonify, request, url_for, send_from_directory, make_response
-import os
 
-from added_files.zipper import file_zipping, zip_delete
-from database import DataBase
-from added_files import login_generator, password_generator
-
+from functions.zipper import file_zipping, zip_delete
+from functions import password_generator, login_generator
 
 from data import db_session
 from data.teachers import Teacher
 from data.exams import Exam
-from data.groups import Group
 from data.portfolio import Portfolio
 from data.students import Student
 
@@ -26,75 +22,114 @@ blueprint = Blueprint(
 
 
 
-
+ #______________________________________________GET_________________________________________________________________
 @blueprint.route('/api/get_student/<login>/<password>')
 def get_student_api(login, password):
     db_sess = db_session.create_session()
     student = db_sess.query(Student).filter(Student.login == login, Student.password == password).first()
-    print(url_for("student_avatar", student_id=student.id))
-    r_obj = student.to_dict(only=("id", 'name', 'password', "birth_date", "created_date", "teacher_id", "group"))
-    r_obj["avatar"] = url_for("student_avatar", student_id=student.id)
-    return jsonify(r_obj)
+    if student:
+        dict_obj = student.to_dict()
+        dict_obj["avatar"] = url_for("student_avatar", student_id=student.id)
+        return jsonify(dict_obj)
+    return jsonify({
+        "operation": None
+    })
 
 
 @blueprint.route('/api/get_teacher/<login>/<password>')
 def get_teacher_api(login, password):
-    teacher = dict(db.get_teacher(login, password))
-    teacher["avatar"] = url_for("teacher_avatar", teacher_id=teacher["teacher_id"])
-    return jsonify(teacher)
+    db_sess = db_session.create_session()
+    teacher = db_sess.query(Teacher).filter(Teacher.login == login, Teacher.password == password).first()
+    if teacher:
+        dict_obj = teacher.to_dict()
+        dict_obj["avatar"] = url_for("teacher_avatar", teacher_id=teacher.id)
+        return jsonify(dict_obj)
+    return jsonify({
+        "Operation": None
+    })
 
 
 @blueprint.route('/api/classes/<teacher_id>')
 def classes_api(teacher_id):
-    teacher = dict(db.get_teacher_by_teacher_id(teacher_id))
-    teacher["avatar"] = url_for("teacher_avatar", teacher_id=teacher["teacher_id"])
-    students = list(db.get_students_by_teacher_id(teacher_id))
-    for index in range(len(students)):
-        students[index] = \
-                        {
-                        "student_id": students[index][0],
-                        "name": students[index][1],
-                        "login": students[index][2],
-                        "password": students[index][3],
-                        "avatar": url_for("student_avatar", student_id=students[index][0]),
-                        "birth_day": students[index][5],
-                        "class": students[index][7]
-                        }
+    db_sess = db_session.create_session()
+    teacher = db_sess.query(Teacher).filter(Teacher.id == teacher_id).first()
+    if teacher:
+        teacher_dict = teacher.to_dict()
+        teacher_dict["avatar"] = url_for("teacher_avatar", teacher_id=teacher_id)
+        students = db_sess.query(Student).filter(Student.teacher_id == teacher_id).all()
+        for index in range(len(students)):
+            students[index] = students[index].to_dict()
+            students[index]["avatar"] = url_for("student_avatar", student_id=students[index]["id"])
+        dict_obj = {
+                "teacher": teacher_dict,
+                "students": students
+        }
+        return jsonify(dict_obj)
 
-    dict_obj = {
-            "teacher": teacher,
-            "students": students
-    }
-    return jsonify(dict_obj)
+    return jsonify({
+        "Operation": None
+    })
 
 
 @blueprint.route('/api/profile/<string:student_id>')
 def profile_api(student_id):
-    student = db.get_student_by_student_id(student_id)
-    portfolio = db.get_portfolio_by_student_id(student_id)
-    port_list = [list(item) for item in portfolio]
-    port_reqs = [list(item)[5] for item in portfolio]
+    db_sess = db_session.create_session()
+    student = db_sess.query(Student).filter(Student.id == student_id).first()
+    portfolio = db_sess.query(Portfolio).filter(Portfolio.student_id == student_id).all()
+    port_list = [item.to_dict() for item in portfolio]
+    for item in port_list:
+        item["request"] = url_for("show_document", filename=item["file_uuid"])
 
-    json_obj = {
-            "student":{
-                    "student_id": student[0],
-                    "name": student[1],
-                    "login": student[2],
-                    "password": student[3],
-                    "avatar": url_for("student_avatar", student_id=student_id),
-                    "birth_day": student[5],
-                    "class": student[6],
-                    "teacher_id": student[7]
-                     },
+    dict_obj = {
+            "student":
+                     student.to_dict(),
             "portfolio":
-                     port_list,
-            "requests":
-                     port_reqs
-             }
+                     port_list
+            }
 
+    return jsonify(dict_obj)
+
+
+@blueprint.route('/api/get_exams/<student_id>')
+def get_exams(student_id):
+    db_sess = db_session.create_session()
+    exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
+    if exams:
+        exams = [exam.to_dict() for exam in exams]
+        for exam in exams:
+            exam.pop("student_id")
+        dict_obj = {
+                    "exams": exams
+                    }
+
+        return jsonify(dict_obj)
+    return jsonify({
+        "exams": None
+    })
+
+
+@blueprint.route('/api/download_all/<student_id>')
+def download_all(student_id):
+    db_sess = db_session.create_session()
+    portfolio = db_sess.query(Portfolio).filter(Portfolio.student_id == student_id).all()
+    archive = file_zipping(portfolio)
+    zip_sender = send_from_directory(DOWNLOAD_FOLDER, archive, as_attachment=True)
+
+    h = make_response(open("./static/files/" + archive, "rb"))
+    h.headers['Content_Type'] = 'files/zip'
+    json_obj = {
+                "request": url_for("show_api_document", h=h)
+               }
+    zip_delete(archive)
     return jsonify(json_obj)
 
 
+@blueprint.route('/api/download_one/')
+def download_one():
+    pass
+
+
+ #______________________________________________POST________________________________________________________________
 @blueprint.route('/api/add_student')
 def add_student_api():
     if not request.json:
@@ -131,17 +166,7 @@ def add_portfolio_api():
         return jsonify({"operation": "OK"})
 
 
-@blueprint.route('/api/get_exams/<student_id>')
-def get_exams(student_id):
-    exams = [dict(x) for x in db.get_exams_by_student_id(student_id)]
-    for exam in exams:
-        exam.pop("student_id")
-        exam.pop("created_at")
-    json_obj = {
-                "exams": exams
-                }
 
-    return jsonify(json_obj)
 
 @blueprint.route("/api/delete_student/<student_id>")
 def delete_student_api(student_id):
@@ -149,21 +174,5 @@ def delete_student_api(student_id):
     return jsonify({"operation": "OK"})
 
 
-@blueprint.route('/api/download_all/<student_id>')
-def download_all(student_id):
-    portfolio = db.get_portfolio_by_student_id(student_id)
-    archive = file_zipping(portfolio)
-    zip_sender = send_from_directory(DOWNLOAD_FOLDER, archive, as_attachment=True)
-
-    h = make_response(open("./static/files/" + archive, "rb"))
-    h.headers['Content_Type'] = 'files/zip'
-    json_obj = {
-                "request": url_for("show_api_document", h=h)
-               }
-    zip_delete(archive)
-    return jsonify(json_obj)
 
 
-@blueprint.route('/api/download_one/')
-def download_one():
-    pass
