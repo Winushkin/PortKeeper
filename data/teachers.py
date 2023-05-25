@@ -2,10 +2,9 @@ import sqlalchemy
 import datetime
 from .db_session import SqlAlchemyBase
 from sqlalchemy import orm
-from sqlalchemy_serializer import SerializerMixin
 
 
-class Teacher(SqlAlchemyBase, SerializerMixin):
+class Teacher(SqlAlchemyBase):
     __tablename__ = "teachers"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -19,3 +18,14 @@ class Teacher(SqlAlchemyBase, SerializerMixin):
     groups = orm.relationship("Group", back_populates="teacher")
 
 
+    def to_dict(self):
+        dict_obj = {
+            "id": self.id,
+            'name': self.name,
+            "login": self.login,
+            "password": self.password,
+            "post": self.post,
+            "created_at": self.created_at,
+
+        }
+        return dict_obj

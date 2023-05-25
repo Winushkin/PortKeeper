@@ -1,1 +1,1 @@
-from. import students, teachers, groups, portfolio, exams
+from. import students, teachers, groups, portfolio, exams, groups_to_students
