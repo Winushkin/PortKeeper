@@ -10,11 +10,6 @@
                 <div class="error">{{ error }}</div>
             {% endfor %}
 
-            {{ form.class_number(class="password", placeholder="Введите класс") }}
-            {% for error in form.class_number.errors %}
-                <div class="error">{{ error }}</div>
-            {% endfor %}
-
             {{ form.submit(class="button-3") }}
         </form>
     </section>

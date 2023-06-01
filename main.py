@@ -8,6 +8,7 @@ from flask import Flask, render_template, redirect, session, request, send_from_
 from forms.login_form import LoginForm
 from forms.StudentAdd_form import AddStudents
 from forms.registration_form import RegistrationForm
+from forms.add_group_form import AddGroup
 
 from functions.login_generator import generate_login
 from functions.password_generator import generate_password
@@ -115,7 +116,6 @@ def student_login():
             session["name"] = student.name
             session["login"] = student.login
             session["birth-date"] = student.birth_date
-            session["class"] = student.group
             return redirect(url_for("profile"))
     return render_template("student-login.html", form=form, title="Student Login")
 
@@ -132,33 +132,66 @@ def classes():
         teacher.avatar = img_bytes
         db_sess.commit()
     teacher = db_sess.query(Teacher).filter(Teacher.id == session["teacher_id"]).first()
-    groups = db_sess.query(Group).filter
-    students = db_sess.query(Student).filter(Student.teacher_id == teacher.id).all()
+    groups = db_sess.query(Group).filter(Group.teacher_id == teacher.id).all()
+    return render_template("classes.html", groups=groups, title="Teacher profile", teacher=teacher)
 
-    return render_template("classes.html", students=students, title="Teacher profile", teacher=teacher)
+
+@app.route("/classes/group/<string:group_id>")
+def classes_group(group_id):
+    if "teacher_id" in session:
+        db_sess = db_session.create_session()
+        students_to_groups = db_sess.query(GroupToStudent).filter(GroupToStudent.group_id == group_id).all()
+        students = [db_sess.query(Student).filter(Student.id == field.student_id).first() for field in students_to_groups]
+        return render_template("group_students.html", title="Students", group_id=group_id, students=students)
+    return redirect(url_for("index"))
 
 
 @app.route("/classes/settings")
 def settings():
     db_sess = db_session.create_session()
     students = db_sess.query(Student).filter(Student.teacher_id == session["teacher_id"])
-    return render_template("settings.html", students=students, title="settings", )
+    return render_template("student_settings.html", students=students, title="settings")
 
 
 @app.route("/delete_student/<string:student_id>")
 def delete_student(student_id):
-    db_sess = db_session.create_session()
-    db_sess.query(Student).filter(Student.id == student_id).delete()
-    db_sess.commit()
-    return redirect(url_for("settings"))
+    if "teacher_id" in session:
+        db_sess = db_session.create_session()
+        db_sess.query(Student).filter(Student.id == student_id).delete()
+        db_sess.commit()
+        return redirect(url_for("settings"))
+    return redirect(url_for("index"))
 
+
+@app.route("/delete_group/<string:group_id>")
+def delete_group(group_id):
+    if "teacher_id" in session:
+        db_sess = db_session.create_session()
+        db_sess.query(Group).filter(Group.id == group_id).delete()
+        # db_sess.query(GroupToStudent).filter(GroupToStudent.group_id == group_id).delete()
+        db_sess.commit()
+        return redirect(url_for("classes"))
+    return redirect(url_for("index"))
+
+@app.route("/add_group",methods=["POST", "GET"])
+def add_group():
+    if "teacher_id" in session:
+        form = AddGroup()
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            name = form.name.data
+            group = Group()
+            group.name = name
+            group.teacher_id = int(session["teacher_id"])
+            db_sess.add(group)
+            db_sess.commit()
+            return redirect(url_for("classes"))
+    return render_template("add-group.html", form=form)
 
 @app.route("/profile/<student_id>", methods=["POST", "GET"])
 def profile_by_id(student_id):
     db_sess = db_session.create_session()
-    #student = db_sess.query(Student).filter(Student.id == student_id).first()
     portfolio = db_sess.query(Portfolio).filter(Portfolio.student_id == student_id).all()
-    #exams = db_sess.query(Exam).filter(Exam.student_id == student_id).all()
     if request.method == "POST":
         db_sess.query(Exam).filter(Exam.student_id == student_id).delete()
         for i in range(1, 5):
@@ -207,21 +240,27 @@ def profile():
     return render_template("student-profile.html", title="Student profile", student=student, port=portfolio,
                                                 exams=exams, subjects=exams_subjects)
 
-@app.route("/add-student", methods=["POST", "GET"])
-def add_student():
+@app.route("/<string:group_id>/add-student", methods=["POST", "GET"])
+def add_student(group_id):
     form = AddStudents()
     if "teacher_id" in session:
         if form.validate_on_submit():
             db_sess = db_session.create_session()
             student = Student()
             student.name = form.student_name.data
-            student.login = generate_login(student.name)
+            login = generate_login(student.name)
+            student.login = login
             student.password = generate_password()
             student.teacher_id = session["teacher_id"]
-            student.group = form.class_number.data
             db_sess.add(student)
             db_sess.commit()
-            return redirect("classes")
+            student = db_sess.query(Student).filter(Student.login == login).first()
+            group_to_stud = GroupToStudent()
+            group_to_stud.group_id = group_id
+            group_to_stud.student_id = student.id
+            db_sess.add(group_to_stud)
+            db_sess.commit()
+            return redirect(url_for("classes_group", group_id=group_id))
     else:
         return redirect("index")
     return render_template("add-students.html", title="new student", form=form)

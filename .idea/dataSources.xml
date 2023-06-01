@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="alchemy_db.db" uuid="fa472e5d-b959-4b6a-b6c6-1145c6784cb4">
+    <data-source source="LOCAL" name="database.db" uuid="7da50a65-ac76-4528-a7f5-66b906138c1e">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>

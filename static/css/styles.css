@@ -356,7 +356,7 @@ input::placeholder {
 
 .students {
     background-color: #FFFFFF;
-    width: 600px;
+    width: 500px;
 }
 
 .students-settings {
@@ -366,21 +366,19 @@ input::placeholder {
 }
 
 
-thead {
-    display: flex;
-}
-.students-list {
+
+
+.groups-list {
     display: flex;
     flex-direction: column;
     width: 100%;
     overflow-y: scroll;
-    height: 300px;
+    height: 250px;
     justify-content: stretch;
 }
 
 tr {
     width: 100%;
-    display: flex;
     align-items: stretch;
 }
 .students td{
@@ -388,19 +386,41 @@ tr {
 }
 
 
+.subjects-table{
+    width: 100%;
+}
+
 .student th:first-child, td:first-child {
-    width: 60%;
+    width: 100%;
 }
 .student th:last-child, td:last-child {
     width: 25%;
 }
 
-th:first-child, td:first-child {
+
+.marks th:first-child, td:first-child {
     width: 70%;
 }
-th:last-child, td:last-child {
+.marks th:last-child, td:last-child {
     width: 30%;
 }
+
+
+.students-list th:first-child, td:first-child {
+    width: 70%;
+}
+.students-list th:last-child, td:last-child {
+    width: 100%;
+}
+
+.students-settings th:first-child, td:first-child {
+    width: 70%;
+}
+.students-settings th:last-child, td:last-child {
+    width: 100%;
+}
+
+
 .btn-red{
     background-color: #800000;
     border: #c5afb0;
@@ -412,12 +432,9 @@ th:last-child, td:last-child {
     min-width: 48%;
 }
 
-.CLASS{
-    min-width: 8%;
-}
 
 .LOGIN{
-    min-width: 13%;
+    min-width: 24%;
 }
 
 .PASS{
@@ -425,7 +442,7 @@ th:last-child, td:last-child {
 }
 
 .CHANGE{
-    min-width: 8%;
+    min-width: 4%;
 }
 
 
@@ -481,20 +498,9 @@ th:last-child, td:last-child {
 }
 
 
-
-
 .avatar-1 {
     padding: 20px;
 }
-
-
-
-
-/* .container-teacher-profile {
-    text-align: center;
-} */
-
-
 
 
 .profile {
@@ -507,8 +513,20 @@ th:last-child, td:last-child {
     align-items: center;
 }
 
+.group-title{
+    width: 100%
+}
 
+.group-name{
+    width: 75%;
+    color: #201E3A;
 
+}
+.group-delete{
+    width: 25%;
+    background-color: #f33f3f;
+    color: #201E3A;
+}
 
 .abt {
     width: 100%;
@@ -552,6 +570,7 @@ th, td {
 
 .student-link{
     color: #855858;
+    width: 100%;
 }
 
 .student-class {
@@ -629,6 +648,10 @@ th {
 
 .marks-tb {
     max-width: 100%;
+}
+
+.marks th{
+    width: 100%;
 }
 
 

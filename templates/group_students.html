@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+  <section class="profile-page">
+    <div class="st-table">
+      <p class="tittle-kl"><strong>ученики</strong></p>
+      <table class="students-settings">
+        <thead>
+          <tr>
+            <th class="FIO">ФИО</th>
+            <th class="LOGIN">Логин</th>
+            <th class="PASS">пароль</th>
+            <th class="CHANGE">Измененить</th>
+          </tr>
+        </thead>
+        <tbody class="students-list">
+          {% for student in students %}
+            <tr>
+              <td class="FIO"><a class="student-link" href="/profile/{{student.id}}">{{student.name}}</a></td>
+              <td class="LOGIN">{{student.login}}</td>
+              <td class="PASS">{{student.password}}</td>
+              <th class="CHANGE btn-red"><a href="/delete_student/{{student.id}}"><strong>удалить</strong></a></th>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a href="/{{group_id}}/add-student" class="button-plus"><strong>+</strong></a>
+    </div>
+  </section>
+{% endblock %}

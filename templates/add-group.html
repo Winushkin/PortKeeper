@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+    <section class="auth-page">
+        <form action="" method="post">
+            {{form.hidden_tag()}}
+            <p class="tittle-auth"><strong>Создать новую группу</strong></p>
+
+            {{form.name(class='login', placeholder="Введите названаие группы")}}
+            {% for error in form.name.errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+
+            {{ form.submit(class="button-3") }}
+        </form>
+    </section>
+{% endblock %}

@@ -45,24 +45,23 @@
             </div>
 
             <div class="st-table">
-                <p class="tittle-kl"><strong>Классы</strong></p>
+                <p class="tittle-kl"><strong>Группы</strong></p>
                 <table class="students">
                     <thead>
                         <tr>
-                            <th>ФИО</th>
-                            <th>Класс</th>
+                            <th class="group-title">Название</th>
                         </tr>
                     </thead>
-                    <tbody class="students-list">
-                        {% for student in students %}
+                    <tbody class="groups-list">
+                        {% for group in groups %}
                         <tr>
-                            <td><a class="student-link" href="/profile/{{student.id}}">{{student.name}}</a></td>
-                            <td class="student-class">{{student.group}}</td>
+                            <td><a class="group-name" href={{url_for('classes_group', group_id=group.id)}}>{{group.name}}</a></td>
+                            <td><a class="group-delete btn-red" href={{url_for('delete_group', group_id=group.id)}}>удалить</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                <a href={{url_for("settings")}} class="button-plus"><strong>управление</strong></a>
+                <a href={{url_for("add_group")}} class="button-plus"><strong>+</strong></a>
             </div>
         </div>
     </section>

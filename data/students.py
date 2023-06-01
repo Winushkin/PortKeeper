@@ -29,8 +29,7 @@ class Student(SqlAlchemyBase):
             "password": self.password,
             "birth_date": self.birth_date,
             "created_date": self.created_date,
-            "teacher_id": self.teacher_id,
-            "group": self.group,
+            "teacher_id": self.teacher_id
 
         }
         return dict_obj
