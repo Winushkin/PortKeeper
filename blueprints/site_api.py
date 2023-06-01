@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request, url_for, send_from_directory, make_response
 
+from data.groups import Group
+from data.groups_to_students import GroupToStudent
 from functions.zipper import file_zipping, zip_delete
 from functions import password_generator, login_generator
 
@@ -90,6 +92,20 @@ def profile_api(student_id):
     return jsonify(dict_obj)
 
 
+@blueprint.route('/api/get_groups/<teacher_id>')
+def get_groups(teacher_id):
+    db_sess = db_session.create_session()
+    groups = [group.to_dict() for group in db_sess.query(Group).filter(Group.teacher_id == teacher_id).all()]
+    if all(groups):
+        json_obj = {
+            "groups": groups
+        }
+        return jsonify(json_obj)
+    return jsonify({
+        "groups": None
+    })
+
+
 @blueprint.route('/api/get_exams/<student_id>')
 def get_exams(student_id):
     db_sess = db_session.create_session()
@@ -135,34 +151,50 @@ def add_student_api():
     if not request.json:
         return jsonify({'error': 'Empty request'})
     elif not all(key in request.json for key in
-                 ['student_name', 'content', 'teacher_id', 'login', 'password']):
+                 ['student_name', 'content', 'teacher_id', 'login', 'password', 'group_id']):
         return jsonify({'error': 'Bad request'})
     else:
         student_name = request.json["student_name"]
-        student_class = request.json["student_class"]
         teacher_id = request.json["teacher_id"]
+        group_id = request.json["group_id"]
         login = login_generator.generate_login(student_name)
-        password = password_generator.generate_password()
+        db_sess = db_session.create_session()
+        student = Student()
+        student.name = student_name
+        student.login = login
+        student.teacher_id = teacher_id
+        student.password = password_generator.generate_password()
+        db_sess.add(student)
+        db_sess.commit()
+        student = db_sess.query(Student).filter(Student.login == login).first()
+        group_to_stud = GroupToStudent()
+        group_to_stud.group_id = group_id
+        group_to_stud.student_id = student.id
+        db_sess.add(group_to_stud)
+        db_sess.commit()
 
-        db.insert_student(student_name, login, password, teacher_id, student_class, 0)
     return jsonify({"operation": "OK"})
+
 
 @blueprint.route('/api/add_portfolio')
 def add_portfolio_api():
     if not request.json:
         return jsonify({'error': 'Empty request'})
     elif not all(key in request.json for key in
-                 ['name', 'level', 'student_id', 'user_id', 'result', 'result', 'random_uuid']):
+                 ['name', 'level', 'student_id', 'user_id', 'result', 'result', 'file_uuid']):
         return jsonify({'error': 'Bad request'})
     else:
-        name = request.json["name"]
-        level = request.json["level"]
-        student_id = request.json["student_id"]
-        subject = request.json["subject"]
-        date = request.json["date"]
-        result = request.json["result"]
-        random_uuid = request.json["random_uuid"]
-        db.insert_portfolio(name, subject, student_id, level, random_uuid, result, date)
+        db_sess = db_session.create_session()
+        port = Portfolio()
+        port.name = request.json["name"]
+        port.level = request.json["level"]
+        port.student_id = request.json["student_id"]
+        port.subject = request.json["subject"]
+        port.date = request.json["date"]
+        port.result = request.json["result"]
+        port.file_uuid = request.json["random_uuid"]
+        db_sess.add(port)
+        db_sess.commit()
         return jsonify({"operation": "OK"})
 
 
@@ -170,7 +202,10 @@ def add_portfolio_api():
 
 @blueprint.route("/api/delete_student/<student_id>")
 def delete_student_api(student_id):
-    db.delete_student_by_id(student_id)
+
+    db_sess = db_session.create_session()
+    db_sess.query(Student).filter(Student.id == student_id).delete()
+    db_sess.commit()
     return jsonify({"operation": "OK"})
 
 
