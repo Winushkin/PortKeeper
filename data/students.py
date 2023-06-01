@@ -9,7 +9,8 @@ class Student(SqlAlchemyBase):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String)
-    login = sqlalchemy.Column(sqlalchemy.String)
+    login = sqlalchemy.Column(sqlalchemy.String, unique=True)
+    #email = sqlalchemy.Column(sqlalchemy.String, unique=True)
     password = sqlalchemy.Column(sqlalchemy.String)
     avatar = sqlalchemy.Column(sqlalchemy.BLOB, default=None)
     birth_date = sqlalchemy.Column(sqlalchemy.Date)
