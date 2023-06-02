@@ -199,7 +199,6 @@ def add_portfolio_api():
 
 
 
-
 @blueprint.route("/api/delete_student/<student_id>")
 def delete_student_api(student_id):
 

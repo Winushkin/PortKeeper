@@ -397,7 +397,7 @@ def student_avatar(student_id):
 @app.route("/teacher_avatar/<string:teacher_id>")
 def teacher_avatar(teacher_id):
     db_sess = db_session.create_session()
-    current_user = db_sess.query(Teacher).filter(Teacher.id == session["teacher_id"]).first()
+    current_user = db_sess.query(Teacher).filter(Teacher.id == teacher_id).first()
     img = current_user.avatar
     if not img:
         return ""
