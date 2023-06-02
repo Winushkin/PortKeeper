@@ -58,13 +58,13 @@ def classes_api(teacher_id):
     if teacher:
         teacher_dict = teacher.to_dict()
         teacher_dict["avatar"] = url_for("teacher_avatar", teacher_id=teacher_id)
-        students = db_sess.query(Student).filter(Student.teacher_id == teacher_id).all()
-        for index in range(len(students)):
-            students[index] = students[index].to_dict()
-            students[index]["avatar"] = url_for("student_avatar", student_id=students[index]["id"])
+        groups = db_sess.query(Group).filter(Group.teacher_id == teacher.id).all()
+        for index in range(len(groups)):
+            groups[index] = groups[index].to_dict()
+            groups[index]["avatar"] = url_for("student_avatar", student_id=groups[index]["id"])
         dict_obj = {
-                "teacher": teacher_dict,
-                "students": students
+                "groups": teacher_dict,
+                "students": groups
         }
         return jsonify(dict_obj)
 
