@@ -217,7 +217,6 @@ def teacher_registration():
         db_sess = db_session.create_session()
         teacher = Teacher()
         teacher.name = request.json["name"]
-        teacher.level = request.json["level"]
         teacher.login = request.json["login"]
         teacher.password = request.json["password"]
         teacher.post = request.json["post"]
