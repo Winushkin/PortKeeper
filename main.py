@@ -14,6 +14,8 @@ from functions.login_generator import generate_login
 from functions.password_generator import generate_password
 from functions.zipper import file_zipping, zip_delete
 
+from waitress import serve
+
 from data import db_session
 from data.students import Student
 from data.teachers import Teacher
@@ -412,4 +414,5 @@ def teacher_avatar(teacher_id):
 if __name__ == "__main__":
     app.register_blueprint(site_api.blueprint)
     db_session.global_init("db/database.db")
-    app.run(debug=True, port=5000, host="94.228.118.49")
+    serve(app, host="0.0.0.0", port=5000)
+    # app.run(debug=True, host="0.0.0.0", port=5000)
