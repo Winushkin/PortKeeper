@@ -201,11 +201,29 @@ def add_portfolio_api():
 
 @blueprint.route("/api/delete_student/<student_id>")
 def delete_student_api(student_id):
-
     db_sess = db_session.create_session()
     db_sess.query(Student).filter(Student.id == student_id).delete()
     db_sess.commit()
     return jsonify({"operation": "OK"})
+
+@blueprint.route("/api/teacher-registration")
+def teacher_registration():
+    if not request.json:
+        return jsonify({'operation': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ['name', 'level', 'student_id', 'user_id', 'result', 'result', 'file_uuid']):
+        return jsonify({'operation': 'Bad request'})
+    else:
+        db_sess = db_session.create_session()
+        teacher = Teacher()
+        teacher.name = request.json["name"]
+        teacher.level = request.json["level"]
+        teacher.login = request.json["login"]
+        teacher.password = request.json["password"]
+        teacher.post = request.json["post"]
+        db_sess.add(teacher)
+        db_sess.commit()
+        return jsonify({"operation": "OK"})
 
 
 
