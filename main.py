@@ -412,5 +412,5 @@ def teacher_avatar(teacher_id):
 if __name__ == "__main__":
     app.register_blueprint(site_api.blueprint)
     db_session.global_init("db/database.db")
-    serve(app, host="0.0.0.0", port=5000)
-    # app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)
+    #serve(app, host="0.0.0.0", port=5000)
